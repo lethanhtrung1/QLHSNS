@@ -1,0 +1,6 @@
+@QLHSNS_HostAddress = http://localhost:5084
+
+GET {{QLHSNS_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
