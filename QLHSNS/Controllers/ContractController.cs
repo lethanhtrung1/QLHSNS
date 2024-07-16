@@ -51,13 +51,24 @@ namespace QLHSNS.Controllers {
 		}
 
 		[HttpPut("UploadFile")]
-		public async Task<IActionResult> UploadFile(Guid id, IFormFile file) {
-			return await _service.UploadFile(id, file);
+		public async Task<ApiResponse<List<string>>> UploadFile(Guid id, List<IFormFile> files) {
+			return await _service.UploadFilesAsync(id, files);
 		}
 
-		[HttpGet("DownloadFile")]
+		[HttpGet("DownloadFile/{id:Guid}")]
 		public async Task<IActionResult> DownloadFile(Guid id) {
-			return await _service.DownloadFile(id);
+			var data = await _service.DownloadFile(id);
+
+			if(data.IsSuccess == true) {
+				return File(data?.Data.ArchiveData, data?.Data.FileType, data?.Data.ArchiveName);
+			}
+
+			return NoContent();
+		}
+
+		[HttpPost("Filter")]
+		public async Task<ApiResponse<PagedResult<ContractResponseDto>>> Filter(FilterContractRequestDto request) {
+			return await _service.FilterAsync(request);
 		}
 	}
 }

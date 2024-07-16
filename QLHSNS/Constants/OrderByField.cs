@@ -7,5 +7,9 @@
 		public const string SORT_BY_JOBTITLE = "jobTitleName";
 		public const string SORT_BY_BANK = "bankName";
 		public const string SORT_BY_NAME = "name";
+
+		public const string SORT_BY_CONTRACT_TYPE = "contractTypeName";
+		public const string SORT_BY_START_DATE = "startDate";
+		public const string SORT_BY_END_DATE = "endDate";
 	}
 }

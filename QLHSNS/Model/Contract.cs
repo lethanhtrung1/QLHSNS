@@ -8,7 +8,7 @@ namespace QLHSNS.Model {
 		public Guid EmployeeId { get; set; }
 		public Guid PayrollId { get; set; }
 
-		public string? FilePath { get; set; }
+		//public string? FilePath { get; set; }
 		public int IsDeleted { get; set; } = 0;
 		public DateTime StartDate { get; set; }
 		public DateTime EndDate { get; set; }
@@ -16,7 +16,7 @@ namespace QLHSNS.Model {
 		public ContractType ContractType { get; set; }
 		public Employee Employee { get; set; }
 		public Payroll Payroll { get; set; }
-
+		public List<Attachment>? Attachments { get; set; }
 		public DateTime CreatedAt { get; set; }
 		public DateTime UpdatedAt { get; set; }
 	}

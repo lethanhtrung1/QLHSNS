@@ -26,6 +26,7 @@ namespace QLHSNS.Data {
 		public DbSet<Asset> Assets { get; set; }
 		public DbSet<EmployeeAsset> EmployeeAssets { get; set; }
 		public DbSet<EmployeeFamily> EmployeeFamilies { get; set; }
+		public DbSet<Attachment> Attachments { get; set; }
 
 		#endregion DbSet
 

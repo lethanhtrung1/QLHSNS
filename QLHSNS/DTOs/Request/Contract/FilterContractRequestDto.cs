@@ -2,7 +2,7 @@
 
 namespace QLHSNS.DTOs.Request.Contract {
 	public class FilterContractRequestDto : PagingRequestBase {
-		public string? Keyword { get; set; }
+		//public string? Keyword { get; set; }
 		public Guid? ContractTypeId { get; set; }
 		public DateTime? StartDate { get; set; }
 		public DateTime? EndDate { get; set; }
