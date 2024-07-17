@@ -1,6 +1,4 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using QLHSNS.Constants;
 using QLHSNS.Data;
@@ -463,16 +461,16 @@ namespace QLHSNS.Services {
 				string wwwroot = _env.WebRootPath;
 
 				foreach (var file in files) {
-					var fileName = Path.GetRandomFileName() + DateTime.Now.ToString("yyyymmddhhmm") + "_" + file.FileName;
+					var fileName = Path.GetRandomFileName() + DateTime.Now.ToString("yyyy_MM_dd-HH_mm_ss") + "_" + file.FileName;
 
 					//var extension = Path.GetExtension(fileName);
-
 					var filePath = Path.Combine(Directory.GetCurrentDirectory(), wwwroot + "\\Upload\\ContractFile");
 
 					if (!Directory.Exists(filePath)) {
 						Directory.CreateDirectory(filePath);
 					}
 
+					var folder = Path.Combine("\\Upload\\ContractFile", fileName);
 					var completePath = Path.Combine(Directory.GetCurrentDirectory(), wwwroot + "\\Upload\\ContractFile", fileName);
 
 					using (var stream = new FileStream(completePath, FileMode.Create)) {
@@ -483,7 +481,7 @@ namespace QLHSNS.Services {
 						Id = Guid.NewGuid(),
 						ContractId = id,
 						FileName = fileName,
-						FilePath = completePath,
+						FilePath = folder,
 						UploadDate = DateTime.Now
 					};
 
@@ -504,12 +502,12 @@ namespace QLHSNS.Services {
 			}
 		}
 
-		public async Task<ApiResponse<AttachmentResponseDto>> DownloadFile(Guid id) {
+		public async Task<ApiResponse<FileResponseDto>> DownloadFile(Guid id) {
 			try {
 				var filePaths = await _dbContext.Attachments.Where(x => x.ContractId == id).Select(x => x.FilePath).ToListAsync();
 
 				if (filePaths == null || filePaths.Count == 0) {
-					return new ApiResponse<AttachmentResponseDto> {
+					return new ApiResponse<FileResponseDto> {
 						IsSuccess = false,
 						Message = Message.DATA_NOT_FOUND
 					};
@@ -520,7 +518,7 @@ namespace QLHSNS.Services {
 				var files = new List<string>();
 
 				foreach (var filePath in filePaths) {
-					var file = Directory.GetFiles(Path.Combine(_env.ContentRootPath, filePath)).ToList();
+					var file = Directory.GetFiles(Path.Combine(_env.WebRootPath, filePath)).ToList();
 					files.AddRange(file);
 				}
 
@@ -534,20 +532,51 @@ namespace QLHSNS.Services {
 						}
 					}
 
-					var result = new AttachmentResponseDto {
+					var result = new FileResponseDto {
 						FileType = "application/zip",
 						ArchiveData = memoryStream.ToArray(),
 						ArchiveName = zipName
 					};
 
-					return new ApiResponse<AttachmentResponseDto> {
+					return new ApiResponse<FileResponseDto> {
 						IsSuccess = true,
 						Data = result,
 						Message = "Pass"
 					};
 				}
 			} catch (Exception ex) {
-				return new ApiResponse<AttachmentResponseDto> {
+				return new ApiResponse<FileResponseDto> {
+					IsSuccess = false,
+					Message = ex.Message
+				};
+			}
+		}
+
+		public async Task<ApiResponse<List<AttachmentResponseDto>>> GetAllFileByContractIdAsync(Guid id) {
+			try {
+				var data = await _dbContext.Attachments.Where(x => x.ContractId == id).ToListAsync();
+
+				if(data == null || data.Count == 0) {
+					return new ApiResponse<List<AttachmentResponseDto>> {
+						IsSuccess = false,
+						Message = Message.DATA_NOT_FOUND
+					};
+				}
+
+				var result = _mapper.Map<List<AttachmentResponseDto>>(data);
+
+				var wwwroot = _env.WebRootPath;
+
+				foreach (var item in result) {
+					item.FilePath = wwwroot + item.FilePath;
+				}
+
+				return new ApiResponse<List<AttachmentResponseDto>> {
+					Data = result,
+					IsSuccess = true,
+				};
+			} catch (Exception ex) {
+				return new ApiResponse<List<AttachmentResponseDto>> {
 					IsSuccess = false,
 					Message = ex.Message
 				};

@@ -105,40 +105,35 @@ namespace QLHSNS.Services {
 														 }
 													 }).FirstAsync();
 
-						var queryAddress = await (from ad in _dbContext.Locations.Where(x => x.Id == newEmployee.LocationId)
-												  select new EmployeeCVDto {
-													  Id = ad.Id,
-													  Country = ad.Country,
-													  District = ad.District,
-													  Province = ad.Province,
-													  Ward = ad.Ward,
-												  }).FirstAsync();
+						var queryAddress = await _dbContext.Locations.Where(x => x.Id == newEmployee.LocationId)
+																	.Select(x => new EmployeeCVDto {
+																		Id = x.Id,
+																		Country = x.Country,
+																		District = x.District,
+																		Province = x.Province,
+																		Ward = x.Ward,
+																	}).FirstAsync();
 
-						var queryHealthCare = await (from hc in _dbContext.HealthCares.Where(x => x.Id == newEmployee.HealthCareId && x.Status == 1)
-													 select new EmployeeHealthCareDto {
-														 Id = hc.Id,
-														 Name = hc.Name,
-														 Address = hc.Address,
-														 Email = hc.Email,
-														 PhoneNumber = hc.PhoneNumber,
-													 }).FirstAsync();
+						var queryHealthCare = await _dbContext.HealthCares.Where(x => x.Id == newEmployee.HealthCareId && x.Status == 1)
+																			.Select(x => new EmployeeHealthCareDto {
+																				Id = x.Id,
+																				Name = x.Name,
+																				Address = x.Address,
+																				Email = x.Email,
+																				PhoneNumber = x.PhoneNumber,
+																			}).FirstAsync();
 
-						var queryDepartment = await (from d in _dbContext.Departments.Where(x => x.Id == newEmployee.DepartmentId && x.Status == 1)
-													 select new EmployeeDepartmentDto {
-														 Id = d.Id,
-														 Name = d.Name,
-													 }).FirstAsync();
-						//var queryDepartment = await _dbContext.Departments.Where(x => x.Id == newEmployee.DepartmentId && x.Status == 1)
-						//												.Select(x => new EmployeeDepartmentDto { 
-						//													Id = x.Id,
-						//													Name = x.Name,
-						//												}).FirstOrDefaultAsync();
+						var queryDepartment = await _dbContext.Departments.Where(x => x.Id == newEmployee.DepartmentId && x.Status == 1)
+																			.Select(x => new EmployeeDepartmentDto {
+																				Id = x.Id,
+																				Name = x.Name,
+																			}).FirstAsync();
 
-						var queryJobTitle = await (from jt in _dbContext.JobTitles.Where(x => x.Id == newEmployee.JobTitleId && x.Status == 1)
-												   select new EmployeeJobTitleDto {
-													   Id = jt.Id,
-													   Name = jt.JobTitleName,
-												   }).FirstAsync();
+						var queryJobTitle = await _dbContext.JobTitles.Where(x => x.Id == newEmployee.JobTitleId && x.Status == 1)
+																		.Select(x => new EmployeeJobTitleDto {
+																			Id = x.Id,
+																			Name = x.JobTitleName
+																		}).FirstAsync();
 
 						var result = _mapper.Map<EmployeeResponseDto>(newEmployee);
 
@@ -179,9 +174,14 @@ namespace QLHSNS.Services {
 				}
 
 				var employeeAssetsToRemove = await _dbContext.EmployeeAssets.Where(x => x.EmployeeId == id).ToListAsync();
+				var employeeFamilyToRemove = await _dbContext.EmployeeFamilies.Where(x => x.EmployeeId == id).ToListAsync();
 
 				foreach (var item in employeeAssetsToRemove) {
 					_dbContext.EmployeeAssets.Remove(item);
+				}
+
+				foreach (var item in employeeFamilyToRemove) {
+					_dbContext.EmployeeFamilies.Remove(item);
 				}
 
 				_dbContext.Employees.Remove(employeeFromDb);

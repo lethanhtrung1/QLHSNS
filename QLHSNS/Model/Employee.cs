@@ -25,6 +25,7 @@ namespace QLHSNS.Model {
 		public BankBranch? BankBranch { get; set; }
 		public List<OverTime> OverTimes { get; set; }
 		public List<EmployeeAsset>? EmployeeAssets { get; set; }
+		public List<EmployeeFamily>? EmployeeFamilies { get; set; }
 		public HealthCare? HealthCare { get; set; }
 	}
 }

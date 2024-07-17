@@ -14,7 +14,8 @@ namespace QLHSNS.Services.IServices {
 		Task<ApiResponse<SoftDeleteContractResponseDto>> SoftDeleteAsync(Guid id);
 		Task<ApiResponse<ContractResponseDto>> GetContractByEmployeeIdAsync(Guid id);
 		Task<ApiResponse<List<string>>> UploadFilesAsync(Guid id, List<IFormFile> files);
-		Task<ApiResponse<AttachmentResponseDto>> DownloadFile(Guid id);
+		Task<ApiResponse<FileResponseDto>> DownloadFile(Guid id);
 		Task<ApiResponse<PagedResult<ContractResponseDto>>> FilterAsync(FilterContractRequestDto request);
+		Task<ApiResponse<List<AttachmentResponseDto>>> GetAllFileByContractIdAsync(Guid id);
 	}
 }

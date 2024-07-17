@@ -1,7 +1,9 @@
 ﻿namespace QLHSNS.DTOs.Response.Contract {
 	public class AttachmentResponseDto {
-		public string FileType { get; set; }
-		public byte[] ArchiveData { get; set; }
-		public string ArchiveName { get; set; }
+		public Guid Id { get; set; }
+		public Guid ContractId { get; set; }
+		public string FileName { get; set; }
+		public string FilePath { get; set; }
+		public DateTime UploadDate { get; set; }
 	}
 }
