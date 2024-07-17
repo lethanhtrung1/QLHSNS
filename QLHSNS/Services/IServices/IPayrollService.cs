@@ -10,8 +10,9 @@ namespace QLHSNS.Services.IServices {
 		Task<ApiResponse<PayrollResponseDto>> DeleteAsync(Guid id);
 		Task<ApiResponse<PayrollResponseDto>> CreateAsync(CreatePayrollRequestDto request);
 		Task<ApiResponse<PayrollResponseDto>> UpdateAsync(UpdatePayrollRequestDto request);
-		Task<ApiResponse<PayrollResponseDto>> AddPayrollAllowanceAsync(AddPayrollAllowanceRequestDto request);
-		Task<ApiResponse<PayrollResponseDto>> AddPayrollBenefitAsync(AddPayrollBenefitRequestDto request);
-		
+		//Task<ApiResponse<PayrollResponseDto>> AddPayrollAllowanceAsync(AddPayrollAllowanceRequestDto request);
+		//Task<ApiResponse<PayrollResponseDto>> AddPayrollBenefitAsync(AddPayrollBenefitRequestDto request);
+		Task<ApiResponse<PayrollResponseDto>> EnableAsync(Guid id);
+		Task<ApiResponse<PayrollResponseDto>> DisableAsync(Guid id);
 	}
 }

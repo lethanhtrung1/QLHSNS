@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using QLHSNS.Constants;
 using QLHSNS.Data;
 using QLHSNS.DTOs.Pagination;
 using QLHSNS.DTOs.Request.Payroll;
@@ -18,13 +19,13 @@ namespace QLHSNS.Services {
 			_mapper = mapper;
 		}
 
-		public Task<ApiResponse<PayrollResponseDto>> AddPayrollAllowanceAsync(AddPayrollAllowanceRequestDto request) {
-			throw new NotImplementedException();
-		}
+		//public Task<ApiResponse<PayrollResponseDto>> AddPayrollAllowanceAsync(AddPayrollAllowanceRequestDto request) {
+		//	throw new NotImplementedException();
+		//}
 
-		public Task<ApiResponse<PayrollResponseDto>> AddPayrollBenefitAsync(AddPayrollBenefitRequestDto request) {
-			throw new NotImplementedException();
-		}
+		//public Task<ApiResponse<PayrollResponseDto>> AddPayrollBenefitAsync(AddPayrollBenefitRequestDto request) {
+		//	throw new NotImplementedException();
+		//}
 
 		public async Task<ApiResponse<PayrollResponseDto>> CreateAsync(CreatePayrollRequestDto request) {
 			try {
@@ -160,9 +161,125 @@ namespace QLHSNS.Services {
 			}
 		}
 
+		public async Task<ApiResponse<PayrollResponseDto>> DisableAsync(Guid id) {
+			try {
+				var dataFromDb = await _dbContext.Payrolls.Where(x => x.Id == id && x.Status == 1).FirstOrDefaultAsync();
+
+				if (dataFromDb == null) {
+					return new ApiResponse<PayrollResponseDto> {
+						IsSuccess = false,
+						Message = Message.DATA_NOT_FOUND
+					};
+				}
+
+				dataFromDb.Status = 1;
+				dataFromDb.UpdatedAt = DateTime.Now;
+
+				await _dbContext.SaveChangesAsync();
+
+				var queryAllowance = await (from pa in _dbContext.PayrollAllowances.Where(x => x.AllowanceId == id)
+											join a in _dbContext.Allowances.Where(x => x.Status == 1) on pa.AllowanceId equals a.Id
+											select new PayrollAllowanceResponseDto {
+												Id = a.Id,
+												Name = a.AllowanceName,
+												Value = a.Value,
+												Unit = a.Unit,
+											}).ToListAsync();
+
+				var queryBenefit = await (from pb in _dbContext.PayrollBenefits.Where(x => x.BenefitId == id)
+										  join b in _dbContext.Benefits.Where(x => x.Status == 1) on pb.BenefitId equals b.Id
+										  select new PayrollBenefitResponseDto {
+											  Id = b.Id,
+											  Name = b.BenefitName,
+											  Amount = b.Amount,
+											  Description = b.Description
+										  }).ToListAsync();
+
+				var totalSalary = dataFromDb.BasicSalary * (decimal)dataFromDb.SalaryCoefficient;
+				totalSalary += GetTotalSalary(queryAllowance, queryBenefit);
+
+				var result = _mapper.Map<PayrollResponseDto>(dataFromDb);
+
+				result.Bonus = new BonusDto {
+					Allowances = queryAllowance,
+					Benefits = queryBenefit
+				};
+
+				result.TotalSalary = totalSalary;
+
+				return new ApiResponse<PayrollResponseDto> {
+					Data = result,
+					IsSuccess = true,
+				};
+			} catch (Exception ex) {
+				return new ApiResponse<PayrollResponseDto> {
+					IsSuccess = false,
+					Message = ex.Message
+				};
+			}
+		}
+
+		public async Task<ApiResponse<PayrollResponseDto>> EnableAsync(Guid id) {
+			try {
+				var dataFromDb = await _dbContext.Payrolls.Where(x => x.Id == id && x.Status == 0).FirstOrDefaultAsync();
+
+				if (dataFromDb == null) {
+					return new ApiResponse<PayrollResponseDto> {
+						IsSuccess = false,
+						Message = Message.DATA_NOT_FOUND
+					};
+				}
+
+				dataFromDb.Status = 0;
+				dataFromDb.UpdatedAt = DateTime.Now;
+
+				await _dbContext.SaveChangesAsync();
+
+				var queryAllowance = await (from pa in _dbContext.PayrollAllowances.Where(x => x.AllowanceId == id)
+											join a in _dbContext.Allowances.Where(x => x.Status == 1) on pa.AllowanceId equals a.Id
+											select new PayrollAllowanceResponseDto {
+												Id = a.Id,
+												Name = a.AllowanceName,
+												Value = a.Value,
+												Unit = a.Unit,
+											}).ToListAsync();
+
+				var queryBenefit = await (from pb in _dbContext.PayrollBenefits.Where(x => x.BenefitId == id)
+										  join b in _dbContext.Benefits.Where(x => x.Status == 1) on pb.BenefitId equals b.Id
+										  select new PayrollBenefitResponseDto {
+											  Id = b.Id,
+											  Name = b.BenefitName,
+											  Amount = b.Amount,
+											  Description = b.Description
+										  }).ToListAsync();
+
+				var totalSalary = dataFromDb.BasicSalary * (decimal)dataFromDb.SalaryCoefficient;
+				totalSalary += GetTotalSalary(queryAllowance, queryBenefit);
+
+				var result = _mapper.Map<PayrollResponseDto>(dataFromDb);
+
+				result.Bonus = new BonusDto {
+					Allowances = queryAllowance,
+					Benefits = queryBenefit
+				};
+
+				result.TotalSalary = totalSalary;
+
+				return new ApiResponse<PayrollResponseDto> {
+					Data = result,
+					IsSuccess = true,
+				};
+			} catch (Exception ex) {
+				return new ApiResponse<PayrollResponseDto> {
+					IsSuccess = false,
+					Message = ex.Message
+				};
+			}
+		}
+
 		public async Task<ApiResponse<PayrollResponseDto>> GetByIdAsync(Guid id) {
 			try {
-				var dataFromDb = _dbContext.Payrolls.Where(x => x.Id == id && x.Status == 1);
+				var dataFromDb = _dbContext.Payrolls.Where(x => x.Id == id && x.Status == 1).FirstOrDefault();
 
 				if (dataFromDb == null) {
 					return new ApiResponse<PayrollResponseDto> {
@@ -172,7 +289,7 @@ namespace QLHSNS.Services {
 				}
 
 				var queryAllowance = await (from pa in _dbContext.PayrollAllowances.Where(x => x.AllowanceId == id)
-											join a in _dbContext.Allowances on pa.AllowanceId equals a.Id
+											join a in _dbContext.Allowances.Where(x => x.Status == 1) on pa.AllowanceId equals a.Id
 											select new PayrollAllowanceResponseDto {
 												Id = a.Id,
 												Name = a.AllowanceName,
@@ -181,7 +298,7 @@ namespace QLHSNS.Services {
 											}).ToListAsync();
 
 				var queryBenefit = await (from pb in _dbContext.PayrollBenefits.Where(x => x.BenefitId == id)
-										  join b in _dbContext.Benefits on pb.BenefitId equals b.Id
+										  join b in _dbContext.Benefits.Where(x => x.Status == 1) on pb.BenefitId equals b.Id
 										  select new PayrollBenefitResponseDto {
 											  Id = b.Id,
 											  Name = b.BenefitName,
@@ -189,12 +306,17 @@ namespace QLHSNS.Services {
 											  Description = b.Description
 										  }).ToListAsync();
 
-				var result = _mapper.Map<PayrollResponseDto>(dataFromDb.FirstOrDefault());
+				var totalSalary = dataFromDb.BasicSalary * (decimal)dataFromDb.SalaryCoefficient;
+				totalSalary += GetTotalSalary(queryAllowance, queryBenefit);
+
+				var result = _mapper.Map<PayrollResponseDto>(dataFromDb);
 
 				result.Bonus = new BonusDto {
 					Allowances = queryAllowance,
 					Benefits = queryBenefit
 				};
+
+				result.TotalSalary = totalSalary;
 
 				return new ApiResponse<PayrollResponseDto> {
 					IsSuccess = true,
@@ -229,14 +351,14 @@ namespace QLHSNS.Services {
 					foreach (var item in payrollList) {
 						//var payrollAllowaces = await _dbContext.PayrollAllowances.Where(x => x.PayrollId == item.Id).ToListAsync();
 						//var allowaces = await _dbContext.Allowances.Where(x => x.Status == 1).ToListAsync();
-						var queryAllowace = await (from pa in _dbContext.PayrollAllowances.Where(x => x.PayrollId == item.Id)
-												   join a in _dbContext.Allowances.Where(x => x.Status == 1) on pa.AllowanceId equals a.Id
-												   select new PayrollAllowanceResponseDto {
-													   Id = a.Id,
-													   Name = a.AllowanceName,
-													   Value = a.Value,
-													   Unit = a.Unit
-												   }).ToListAsync();
+						var queryAllowance = await (from pa in _dbContext.PayrollAllowances.Where(x => x.PayrollId == item.Id)
+													join a in _dbContext.Allowances.Where(x => x.Status == 1) on pa.AllowanceId equals a.Id
+													select new PayrollAllowanceResponseDto {
+														Id = a.Id,
+														Name = a.AllowanceName,
+														Value = a.Value,
+														Unit = a.Unit
+													}).ToListAsync();
 
 						var queryBenefit = await (from pb in _dbContext.PayrollBenefits.Where(x => x.PayrollId == item.Id)
 												  join b in _dbContext.Benefits.Where(x => x.Status == 1) on pb.BenefitId equals b.Id
@@ -246,12 +368,21 @@ namespace QLHSNS.Services {
 													  Amount = b.Amount,
 													  Description = b.Description,
 												  }).ToListAsync();
+
 						var bonus = new BonusDto {
-							Allowances = queryAllowace,
+							Allowances = queryAllowance,
 							Benefits = queryBenefit
 						};
+
+						// Caculator Total salary
+						var totalSalary = item.BasicSalary * (decimal)item.SalaryCoefficient;
+						totalSalary += GetTotalSalary(queryAllowance, queryBenefit);
+
 						var temp = _mapper.Map<PayrollResponseDto>(item);
+
 						temp.Bonus = bonus;
+						temp.TotalSalary = totalSalary;
+
 						result.Add(temp);
 					}
 
@@ -395,6 +526,23 @@ namespace QLHSNS.Services {
 					Message = ex.Message
 				};
 			}
+		}
+
+
+		private decimal GetTotalSalary(List<PayrollAllowanceResponseDto> AllowanceIds, List<PayrollBenefitResponseDto> BenefitsIds) {
+			decimal totalSalary = 0;
+
+			foreach (var item in AllowanceIds) {
+				if (item.Unit == "Month") {
+					totalSalary += item.Value;
+				}
+			}
+
+			foreach (var item in BenefitsIds) {
+				totalSalary += item.Amount;
+			}
+
+			return totalSalary;
 		}
 	}
 }

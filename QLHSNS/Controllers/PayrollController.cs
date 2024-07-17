@@ -39,5 +39,15 @@ namespace QLHSNS.Controllers {
 		public async Task<ApiResponse<PayrollResponseDto>> Delete(Guid id) {
 			return await _service.DeleteAsync(id);
 		}
+
+		[HttpPut("Enable/{id:Guid}")]
+		public async Task<ApiResponse<PayrollResponseDto>> Enable(Guid id) {
+			return await _service.EnableAsync(id);
+		}
+
+		[HttpPut("Disable/{id:Guid}")]
+		public async Task<ApiResponse<PayrollResponseDto>> Disable(Guid id) {
+			return await _service.DisableAsync(id);
+		}
 	}
 }

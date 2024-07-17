@@ -556,7 +556,7 @@ namespace QLHSNS.Services {
 			try {
 				var data = await _dbContext.Attachments.Where(x => x.ContractId == id).ToListAsync();
 
-				if(data == null || data.Count == 0) {
+				if (data == null || data.Count == 0) {
 					return new ApiResponse<List<AttachmentResponseDto>> {
 						IsSuccess = false,
 						Message = Message.DATA_NOT_FOUND
