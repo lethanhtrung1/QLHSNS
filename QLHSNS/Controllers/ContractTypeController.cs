@@ -22,7 +22,7 @@ namespace QLHSNS.Controllers {
 
 		[HttpPost("GetAll")]
 		public async Task<ApiResponse<PagedResult<ContractType>>> GetAll(PagingRequestBase request) {
-			return await _constractTypeService.GetAsync(request);
+			return await _constractTypeService.GetPagingAsync(request);
 		}
 
 		[HttpPost("Create")]
@@ -36,9 +36,10 @@ namespace QLHSNS.Controllers {
 		}
 
 		[HttpDelete("Delete/{id:Guid}")]
-		public async Task<ApiResponse<ContractType>> Delete(Guid id) {
-			return await _constractTypeService.DeleteAsync(id);
-		}
+		public async Task<IActionResult> Delete(Guid id) {
+			var result = await _constractTypeService.DeleteAsync(id);
+			return result ? Ok() : BadRequest();
+ 		}
 
 		[HttpPut("Enable/{id:Guid}")]
 		public async Task<ApiResponse<ContractType>> Enable(Guid id) {
@@ -48,6 +49,11 @@ namespace QLHSNS.Controllers {
 		[HttpPut("Disable/{id:Guid}")]
 		public async Task<ApiResponse<ContractType>> Disable(Guid id) {
 			return await _constractTypeService.DisableAsync(id);
+		}
+
+		[HttpGet("GetAll")]
+		public async Task<ApiResponse<List<ContractType>>> GetAll() {
+			return await _constractTypeService.GetAllAsync();
 		}
 	}
 }

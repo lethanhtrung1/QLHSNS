@@ -19,14 +19,6 @@ namespace QLHSNS.Services {
 			_mapper = mapper;
 		}
 
-		//public Task<ApiResponse<PayrollResponseDto>> AddPayrollAllowanceAsync(AddPayrollAllowanceRequestDto request) {
-		//	throw new NotImplementedException();
-		//}
-
-		//public Task<ApiResponse<PayrollResponseDto>> AddPayrollBenefitAsync(AddPayrollBenefitRequestDto request) {
-		//	throw new NotImplementedException();
-		//}
-
 		public async Task<ApiResponse<PayrollResponseDto>> CreateAsync(CreatePayrollRequestDto request) {
 			try {
 				if (request != null) {
@@ -123,15 +115,12 @@ namespace QLHSNS.Services {
 			}
 		}
 
-		public async Task<ApiResponse<PayrollResponseDto>> DeleteAsync(Guid id) {
+		public async Task<bool> DeleteAsync(Guid id) {
 			try {
 				var dataFromDb = await _dbContext.Payrolls.Where(x => x.Id == id && x.Status == 1).FirstOrDefaultAsync();
 
 				if (dataFromDb == null) {
-					return new ApiResponse<PayrollResponseDto> {
-						IsSuccess = false,
-						Message = "Not found"
-					};
+					return false;
 				}
 
 				var payrollAllowancesToDelete = await _dbContext.PayrollAllowances.Where(x => x.PayrollId == id).ToListAsync();
@@ -149,15 +138,10 @@ namespace QLHSNS.Services {
 
 				await _dbContext.SaveChangesAsync();
 
-				return new ApiResponse<PayrollResponseDto> {
-					IsSuccess = true,
-					Message = "Deleted successfully"
-				};
-			} catch (Exception ex) {
-				return new ApiResponse<PayrollResponseDto> {
-					IsSuccess = true,
-					Message = ex.Message
-				};
+				return true;
+			} catch (Exception) {
+
+				throw;
 			}
 		}
 

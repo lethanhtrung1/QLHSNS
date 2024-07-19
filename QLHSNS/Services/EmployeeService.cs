@@ -162,16 +162,11 @@ namespace QLHSNS.Services {
 			}
 		}
 
-		public async Task<ApiResponse<EmployeeResponseDto>> DeleteEmployeeAsync(Guid id) {
+		public async Task<bool> DeleteEmployeeAsync(Guid id) {
 			try {
 				var employeeFromDb = await _dbContext.Employees.Where(x => x.Id == id).FirstOrDefaultAsync();
 
-				if (employeeFromDb == null) {
-					return new ApiResponse<EmployeeResponseDto> {
-						IsSuccess = false,
-						Message = "Not found"
-					};
-				}
+				if (employeeFromDb == null) return false;
 
 				var employeeAssetsToRemove = await _dbContext.EmployeeAssets.Where(x => x.EmployeeId == id).ToListAsync();
 				var employeeFamilyToRemove = await _dbContext.EmployeeFamilies.Where(x => x.EmployeeId == id).ToListAsync();
@@ -186,15 +181,9 @@ namespace QLHSNS.Services {
 
 				_dbContext.Employees.Remove(employeeFromDb);
 
-				return new ApiResponse<EmployeeResponseDto> {
-					IsSuccess = true,
-					Message = "Deleted successfully"
-				};
-			} catch (Exception ex) {
-				return new ApiResponse<EmployeeResponseDto> {
-					IsSuccess = false,
-					Message = ex.Message
-				};
+				return true;
+			} catch (Exception) {
+				throw;
 			}
 		}
 

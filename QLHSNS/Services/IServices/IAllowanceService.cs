@@ -11,7 +11,7 @@ namespace QLHSNS.Services.IServices {
 		Task<ApiResponse<List<AllowanceResponseDto>>> GetAllAsync();
 		Task<ApiResponse<AllowanceResponseDto>> CreateAsync(CreateAllowanceRequestDto request);
 		Task<ApiResponse<AllowanceResponseDto>> UpdateAsync(UpdateAllowanceRequestDto request);
-		Task<ApiResponse<AllowanceResponseDto>> DeleteAsync(Guid id);
+		Task<bool> DeleteAsync(Guid id);
 		Task<ApiResponse<AllowanceResponseDto>> EnableAsync(Guid id);
 		Task<ApiResponse<AllowanceResponseDto>> DisableAsync(Guid id);
 	}

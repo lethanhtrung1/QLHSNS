@@ -5,11 +5,11 @@ using QLHSNS.DTOs.Request.Benefit;
 using QLHSNS.DTOs.Request.Contract;
 using QLHSNS.DTOs.Request.ContractType;
 using QLHSNS.DTOs.Request.Department;
-using QLHSNS.DTOs.Request.EmployeeFamily;
 using QLHSNS.DTOs.Request.EmployeeRequestDto;
 using QLHSNS.DTOs.Request.HealthCareRequestDto;
 using QLHSNS.DTOs.Request.JobTitle;
 using QLHSNS.DTOs.Request.Payroll;
+using QLHSNS.DTOs.Request.Reward;
 using QLHSNS.DTOs.Response.Allowance;
 using QLHSNS.DTOs.Response.Asset;
 using QLHSNS.DTOs.Response.Bank;
@@ -21,6 +21,7 @@ using QLHSNS.DTOs.Response.Employee;
 using QLHSNS.DTOs.Response.EmployeeFamily;
 using QLHSNS.DTOs.Response.JobTitle;
 using QLHSNS.DTOs.Response.Payroll;
+using QLHSNS.DTOs.Response.Reward;
 using QLHSNS.Model;
 
 namespace QLHSNS.MappingConfigurations {
@@ -68,6 +69,21 @@ namespace QLHSNS.MappingConfigurations {
 				config.CreateMap<Attachment, AttachmentResponseDto>().ReverseMap();
 
 				config.CreateMap<EmployeeFamily, EmployeeFamilyResponseDto>().ReverseMap();
+
+				// Domain to Response
+				config.CreateMap<Reward, RewardResponseDto>();
+
+				// Request to Domain
+				config.CreateMap<CreateRewardRequestDto, Reward>()
+					.ForMember(
+						dest => dest.IsReceived,
+						opt => opt.MapFrom(src => 0))
+					.ForMember(
+						dest => dest.CreatedAt,
+						opt => opt.MapFrom(src => DateTime.Now))
+					.ForMember(
+						dest => dest.UpdatedAt,
+						opt => opt.MapFrom(src => DateTime.Now));
 			});
 
 			return mappingConfig;

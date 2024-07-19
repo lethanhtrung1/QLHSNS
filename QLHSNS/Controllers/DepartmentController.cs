@@ -46,8 +46,9 @@ namespace QLHSNS.Controllers {
 		}
 
 		[HttpDelete("Delete/{id:Guid}")]
-		public async Task<ApiResponse<DepartmentResponseDto>> Delete(Guid id) {
-			return await _service.DeleteDepartmentAsync(id);
+		public async Task<IActionResult> Delete(Guid id) {
+			var result = await _service.DeleteDepartmentAsync(id);
+			return result ? Ok() : BadRequest();
 		}
 
 		[HttpPost("AddDepartmentJobTitle")]

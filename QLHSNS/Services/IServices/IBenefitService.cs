@@ -8,7 +8,7 @@ namespace QLHSNS.Services.IServices {
 		Task<ApiResponse<PagedResult<BenefitResponseDto>>> GetPagingAsync(PagingRequestBase request);
 		Task<ApiResponse<BenefitResponseDto>> GetByIdAsync(Guid id);
 		Task<ApiResponse<BenefitResponseDto>> CreateAsync(CreateBenefitRequestDto request);
-		Task<ApiResponse<BenefitResponseDto>> DeleteAsync(Guid id);
+		Task<bool> DeleteAsync(Guid id);
 		Task<ApiResponse<BenefitResponseDto>> UpdateAsync(UpdateBenefitRequestDto request);
 		Task<ApiResponse<BenefitResponseDto>> EnableAsync(Guid id);
 		Task<ApiResponse<BenefitResponseDto>> DisableAsync(Guid id);

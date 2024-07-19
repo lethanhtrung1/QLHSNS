@@ -31,8 +31,9 @@ namespace QLHSNS.Controllers {
 		}
 
 		[HttpDelete("Delete/{id:Guid}")]
-		public async Task<ApiResponse<ContractResponseDto>> DeleteContract(Guid id) {
-			return await _service.DeleteAsync(id);
+		public async Task<IActionResult> DeleteContract(Guid id) {
+			var result = await _service.DeleteAsync(id);
+			return result ? Ok() : BadRequest();
 		}
 
 		[HttpPost("GetContractPaging")]
@@ -59,7 +60,7 @@ namespace QLHSNS.Controllers {
 		public async Task<IActionResult> DownloadFile(Guid id) {
 			var data = await _service.DownloadFile(id);
 
-			if(data.IsSuccess == true) {
+			if (data.IsSuccess == true) {
 				return File(data?.Data.ArchiveData, data?.Data.FileType, data?.Data.ArchiveName);
 			}
 

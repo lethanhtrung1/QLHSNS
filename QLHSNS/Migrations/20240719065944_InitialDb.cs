@@ -190,7 +190,7 @@ namespace QLHSNS.Migrations
                         column: x => x.BankId,
                         principalTable: "Banks",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -208,14 +208,12 @@ namespace QLHSNS.Migrations
                         name: "FK_DepartmentJobTitles_Departments_DepartmentId",
                         column: x => x.DepartmentId,
                         principalTable: "Departments",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_DepartmentJobTitles_JobTitles_JobTitleId",
                         column: x => x.JobTitleId,
                         principalTable: "JobTitles",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -233,14 +231,12 @@ namespace QLHSNS.Migrations
                         name: "FK_PayrollAllowances_Allowances_AllowanceId",
                         column: x => x.AllowanceId,
                         principalTable: "Allowances",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_PayrollAllowances_Payrolls_PayrollId",
                         column: x => x.PayrollId,
                         principalTable: "Payrolls",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -258,14 +254,12 @@ namespace QLHSNS.Migrations
                         name: "FK_PayrollBenefits_Benefits_BenefitId",
                         column: x => x.BenefitId,
                         principalTable: "Benefits",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_PayrollBenefits_Payrolls_PayrollId",
                         column: x => x.PayrollId,
                         principalTable: "Payrolls",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -300,8 +294,7 @@ namespace QLHSNS.Migrations
                         name: "FK_Employees_Departments_DepartmentId",
                         column: x => x.DepartmentId,
                         principalTable: "Departments",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Employees_HealthCares_HealthCareId",
                         column: x => x.HealthCareId,
@@ -311,8 +304,7 @@ namespace QLHSNS.Migrations
                         name: "FK_Employees_JobTitles_JobTitleId",
                         column: x => x.JobTitleId,
                         principalTable: "JobTitles",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Employees_Locations_LocationId",
                         column: x => x.LocationId,
@@ -328,7 +320,6 @@ namespace QLHSNS.Migrations
                     ContractTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     EmployeeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     PayrollId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    FilePath = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsDeleted = table.Column<int>(type: "int", nullable: false),
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -342,20 +333,19 @@ namespace QLHSNS.Migrations
                         name: "FK_Contracts_ContractTypes_ContractTypeId",
                         column: x => x.ContractTypeId,
                         principalTable: "ContractTypes",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Contracts_Employees_EmployeeId",
                         column: x => x.EmployeeId,
                         principalTable: "Employees",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Contracts_Payrolls_PayrollId",
                         column: x => x.PayrollId,
                         principalTable: "Payrolls",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -373,14 +363,12 @@ namespace QLHSNS.Migrations
                         name: "FK_EmployeeAssets_Assets_AssetId",
                         column: x => x.AssetId,
                         principalTable: "Assets",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_EmployeeAssets_Employees_EmployeeId",
                         column: x => x.EmployeeId,
                         principalTable: "Employees",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -402,8 +390,7 @@ namespace QLHSNS.Migrations
                         name: "FK_EmployeeFamilies_Employees_EmployeeId",
                         column: x => x.EmployeeId,
                         principalTable: "Employees",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -424,8 +411,59 @@ namespace QLHSNS.Migrations
                         column: x => x.EmployeeId,
                         principalTable: "Employees",
                         principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Rewards",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    EmployeeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    RewardAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Month = table.Column<int>(type: "int", nullable: false),
+                    Year = table.Column<int>(type: "int", nullable: false),
+                    IsReceived = table.Column<int>(type: "int", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Rewards", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Rewards_Employees_EmployeeId",
+                        column: x => x.EmployeeId,
+                        principalTable: "Employees",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Attachments",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ContractId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    FileName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FilePath = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UploadDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Attachments", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Attachments_Contracts_ContractId",
+                        column: x => x.ContractId,
+                        principalTable: "Contracts",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Attachments_ContractId",
+                table: "Attachments",
+                column: "ContractId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_BankBranches_BankId",
@@ -521,13 +559,18 @@ namespace QLHSNS.Migrations
                 name: "IX_PayrollBenefits_PayrollId",
                 table: "PayrollBenefits",
                 column: "PayrollId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Rewards_EmployeeId",
+                table: "Rewards",
+                column: "EmployeeId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Contracts");
+                name: "Attachments");
 
             migrationBuilder.DropTable(
                 name: "DepartmentJobTitles");
@@ -548,19 +591,25 @@ namespace QLHSNS.Migrations
                 name: "PayrollBenefits");
 
             migrationBuilder.DropTable(
-                name: "ContractTypes");
+                name: "Rewards");
+
+            migrationBuilder.DropTable(
+                name: "Contracts");
 
             migrationBuilder.DropTable(
                 name: "Assets");
-
-            migrationBuilder.DropTable(
-                name: "Employees");
 
             migrationBuilder.DropTable(
                 name: "Allowances");
 
             migrationBuilder.DropTable(
                 name: "Benefits");
+
+            migrationBuilder.DropTable(
+                name: "ContractTypes");
+
+            migrationBuilder.DropTable(
+                name: "Employees");
 
             migrationBuilder.DropTable(
                 name: "Payrolls");

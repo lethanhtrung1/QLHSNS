@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Azure.Core;
 using Microsoft.EntityFrameworkCore;
 using QLHSNS.Data;
 using QLHSNS.DTOs.Pagination;
@@ -8,7 +7,6 @@ using QLHSNS.DTOs.Response;
 using QLHSNS.DTOs.Response.Asset;
 using QLHSNS.Model;
 using QLHSNS.Services.IServices;
-using System.Collections.Immutable;
 
 namespace QLHSNS.Services {
 	public class AssetService : IAssetService {
@@ -20,12 +18,13 @@ namespace QLHSNS.Services {
 			_mapper = mapper;
 		}
 
-		public async Task<ApiResponse<AssetResponseDto>> CreateAssetAsync(CreateAssetRequestDto request) {
+		public async Task<ApiResponse<string>> CreateAssetAsync(CreateAssetRequestDto request) {
 			try {
 				if (request != null) {
 					var dataFromDb = await _dbContext.Assets.Where(x => x.Name.ToLower() == request.Name.ToLower()).FirstOrDefaultAsync();
+
 					if (dataFromDb != null) {
-						return new ApiResponse<AssetResponseDto> {
+						return new ApiResponse<string> {
 							IsSuccess = false,
 							Message = "Asset already exist"
 						};
@@ -34,47 +33,34 @@ namespace QLHSNS.Services {
 					await _dbContext.Assets.AddAsync(data);
 					await _dbContext.SaveChangesAsync();
 
-					var query = await _dbContext.Assets.Where(x => x.Id == data.Id).FirstOrDefaultAsync();
-					var result = _mapper.Map<AssetResponseDto>(query);
-
-					return new ApiResponse<AssetResponseDto> {
+					return new ApiResponse<string> {
 						IsSuccess = true,
-						Data = result
+						Data = data.Id.ToString()
 					};
 				}
-				return new ApiResponse<AssetResponseDto> {
+				return new ApiResponse<string> {
 					IsSuccess = false,
 					Message = "Invalid payload"
 				};
 			} catch (Exception ex) {
-				return new ApiResponse<AssetResponseDto> {
+				return new ApiResponse<string> {
 					IsSuccess = false,
 					Message = ex.Message
 				};
 			}
 		}
 
-		public async Task<ApiResponse<AssetResponseDto>> DeleteAssetAsync(Guid id) {
+		public async Task<bool> DeleteAssetAsync(Guid id) {
 			try {
 				var dataFromDb = await _dbContext.Assets.Where(x => x.Id == id).FirstOrDefaultAsync();
-				if (dataFromDb == null) {
-					return new ApiResponse<AssetResponseDto> {
-						IsSuccess = false,
-						Message = "Not found"
-					};
-				}
+				if (dataFromDb == null) return false;
+
 				_dbContext.Assets.Remove(dataFromDb);
 				await _dbContext.SaveChangesAsync();
 
-				return new ApiResponse<AssetResponseDto> {
-					IsSuccess = true,
-					Message = "Deleted successfully"
-				};
-			} catch (Exception ex) {
-				return new ApiResponse<AssetResponseDto> {
-					IsSuccess = false,
-					Message = ex.Message
-				};
+				return true;
+			} catch (Exception) {
+				throw;
 			}
 		}
 

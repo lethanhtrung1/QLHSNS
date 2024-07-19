@@ -9,7 +9,7 @@ namespace QLHSNS.Services.IServices {
 		Task<ApiResponse<PagedResult<DepartmentResponseDto>>> GetDepartmentsAsync(PagingRequestBase request);
 		Task<ApiResponse<DepartmentResponseDto>> CreateDepartmentAsync(CreateDepartmentRequestDto request);
 		Task<ApiResponse<DepartmentResponseDto>> UpdateDepartmentAsync(UpdateDepartmentRequestDto request);
-		Task<ApiResponse<DepartmentResponseDto>> DeleteDepartmentAsync(Guid id);
+		Task<bool> DeleteDepartmentAsync(Guid id);
 		Task<ApiResponse<DepartmentResponseDto>> EnableDepartmentAsync(Guid id);
 		Task<ApiResponse<DepartmentResponseDto>> DisableDepartmentAsync(Guid id);
 		Task<ApiResponse<List<DepartmentJobTitleResponseDto>>> AddDepartmentJobTitleAsync(DepartmentJobTitleRequestDto request);

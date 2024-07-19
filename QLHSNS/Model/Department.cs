@@ -8,6 +8,7 @@ namespace QLHSNS.Model {
 		public int Status { get; set; }
 		public DateTime CreatedAt { get; set; }
 		public DateTime UpdatedAt { get; set; }
-		public List<DepartmentJobTitle> DepartmentJobTitles { get; set; }
+		public virtual List<DepartmentJobTitle> DepartmentJobTitles { get; set; }
+		public virtual List<Employee>? Employees { get; set; }
 	}
 }

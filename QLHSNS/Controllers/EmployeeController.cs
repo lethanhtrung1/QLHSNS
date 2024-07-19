@@ -42,8 +42,9 @@ namespace QLHSNS.Controllers {
 		}
 
 		[HttpDelete("Delete/{id:Guid}")]
-		public async Task<ApiResponse<EmployeeResponseDto>> DeleteEmployee(Guid id) {
-			return await _service.DeleteEmployeeAsync(id);
+		public async Task<IActionResult> DeleteEmployee(Guid id) {
+			var result = await _service.DeleteEmployeeAsync(id);
+			return result ? Ok() : BadRequest();
 		}
 
 		[HttpPost("SearchEmployee")]

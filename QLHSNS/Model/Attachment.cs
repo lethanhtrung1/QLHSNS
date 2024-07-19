@@ -8,5 +8,6 @@
 		//public string FileType { get; set; }
 		//public string FileSize { get; set; }
 		public DateTime UploadDate { get; set; }
+		public Contract Contract { get; set; }
 	}
 }

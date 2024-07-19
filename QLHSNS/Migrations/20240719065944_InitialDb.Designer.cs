@@ -12,8 +12,8 @@ using QLHSNS.Data;
 namespace QLHSNS.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240716072246_AddAttachmentTable")]
-    partial class AddAttachmentTable
+    [Migration("20240719065944_InitialDb")]
+    partial class InitialDb
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -610,13 +610,52 @@ namespace QLHSNS.Migrations
                     b.ToTable("PayrollBenefits");
                 });
 
+            modelBuilder.Entity("QLHSNS.Model.Reward", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("EmployeeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("IsReceived")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Month")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("RewardAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.ToTable("Rewards");
+                });
+
             modelBuilder.Entity("QLHSNS.Model.Attachment", b =>
                 {
-                    b.HasOne("QLHSNS.Model.Contract", null)
+                    b.HasOne("QLHSNS.Model.Contract", "Contract")
                         .WithMany("Attachments")
                         .HasForeignKey("ContractId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Contract");
                 });
 
             modelBuilder.Entity("QLHSNS.Model.BankBranch", b =>
@@ -624,7 +663,7 @@ namespace QLHSNS.Migrations
                     b.HasOne("QLHSNS.Model.Bank", "Bank")
                         .WithMany("BankBranches")
                         .HasForeignKey("BankId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Bank");
@@ -635,19 +674,19 @@ namespace QLHSNS.Migrations
                     b.HasOne("QLHSNS.Model.ContractType", "ContractType")
                         .WithMany()
                         .HasForeignKey("ContractTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("QLHSNS.Model.Employee", "Employee")
-                        .WithMany()
+                        .WithMany("Contracts")
                         .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("QLHSNS.Model.Payroll", "Payroll")
-                        .WithMany()
+                        .WithMany("Contracts")
                         .HasForeignKey("PayrollId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("ContractType");
@@ -662,13 +701,13 @@ namespace QLHSNS.Migrations
                     b.HasOne("QLHSNS.Model.Department", "Department")
                         .WithMany("DepartmentJobTitles")
                         .HasForeignKey("DepartmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("QLHSNS.Model.JobTitle", "JobTitle")
                         .WithMany("DepartmentJobTitles")
                         .HasForeignKey("JobTitleId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Department");
@@ -680,27 +719,30 @@ namespace QLHSNS.Migrations
                 {
                     b.HasOne("QLHSNS.Model.BankBranch", "BankBranch")
                         .WithMany()
-                        .HasForeignKey("BankBranchId");
+                        .HasForeignKey("BankBranchId")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("QLHSNS.Model.Department", "Department")
-                        .WithMany()
+                        .WithMany("Employees")
                         .HasForeignKey("DepartmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("QLHSNS.Model.HealthCare", "HealthCare")
                         .WithMany()
-                        .HasForeignKey("HealthCareId");
+                        .HasForeignKey("HealthCareId")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("QLHSNS.Model.JobTitle", "JobTitle")
-                        .WithMany()
+                        .WithMany("Employees")
                         .HasForeignKey("JobTitleId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("QLHSNS.Model.Location", "Location")
                         .WithMany()
-                        .HasForeignKey("LocationId");
+                        .HasForeignKey("LocationId")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("BankBranch");
 
@@ -718,13 +760,13 @@ namespace QLHSNS.Migrations
                     b.HasOne("QLHSNS.Model.Asset", "Asset")
                         .WithMany("EmployeeAssets")
                         .HasForeignKey("AssetId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("QLHSNS.Model.Employee", "Employee")
                         .WithMany("EmployeeAssets")
                         .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Asset");
@@ -735,9 +777,9 @@ namespace QLHSNS.Migrations
             modelBuilder.Entity("QLHSNS.Model.EmployeeFamily", b =>
                 {
                     b.HasOne("QLHSNS.Model.Employee", "Employee")
-                        .WithMany()
+                        .WithMany("EmployeeFamilies")
                         .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Employee");
@@ -748,7 +790,7 @@ namespace QLHSNS.Migrations
                     b.HasOne("QLHSNS.Model.Employee", "Employee")
                         .WithMany("OverTimes")
                         .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Employee");
@@ -759,13 +801,13 @@ namespace QLHSNS.Migrations
                     b.HasOne("QLHSNS.Model.Allowance", "Allowance")
                         .WithMany("PayrollAllowances")
                         .HasForeignKey("AllowanceId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("QLHSNS.Model.Payroll", "Payroll")
                         .WithMany("PayrollAllowances")
                         .HasForeignKey("PayrollId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Allowance");
@@ -778,18 +820,29 @@ namespace QLHSNS.Migrations
                     b.HasOne("QLHSNS.Model.Benefit", "Benefit")
                         .WithMany("PayrollBenefits")
                         .HasForeignKey("BenefitId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("QLHSNS.Model.Payroll", "Payroll")
                         .WithMany("PayrollBenefits")
                         .HasForeignKey("PayrollId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Benefit");
 
                     b.Navigation("Payroll");
+                });
+
+            modelBuilder.Entity("QLHSNS.Model.Reward", b =>
+                {
+                    b.HasOne("QLHSNS.Model.Employee", "Employee")
+                        .WithMany("Rewards")
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
                 });
 
             modelBuilder.Entity("QLHSNS.Model.Allowance", b =>
@@ -820,22 +873,34 @@ namespace QLHSNS.Migrations
             modelBuilder.Entity("QLHSNS.Model.Department", b =>
                 {
                     b.Navigation("DepartmentJobTitles");
+
+                    b.Navigation("Employees");
                 });
 
             modelBuilder.Entity("QLHSNS.Model.Employee", b =>
                 {
+                    b.Navigation("Contracts");
+
                     b.Navigation("EmployeeAssets");
 
+                    b.Navigation("EmployeeFamilies");
+
                     b.Navigation("OverTimes");
+
+                    b.Navigation("Rewards");
                 });
 
             modelBuilder.Entity("QLHSNS.Model.JobTitle", b =>
                 {
                     b.Navigation("DepartmentJobTitles");
+
+                    b.Navigation("Employees");
                 });
 
             modelBuilder.Entity("QLHSNS.Model.Payroll", b =>
                 {
+                    b.Navigation("Contracts");
+
                     b.Navigation("PayrollAllowances");
 
                     b.Navigation("PayrollBenefits");

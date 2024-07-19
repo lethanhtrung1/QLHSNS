@@ -65,29 +65,18 @@ namespace QLHSNS.Services {
 			throw new NotImplementedException();
 		}
 
-		public async Task<ApiResponse<EmployeeFamilyResponseDto>> DeleteAsync(Guid id) {
+		public async Task<bool> DeleteAsync(Guid id) {
 			try {
 				var dataFromDb = await _dbContext.EmployeeFamilies.Where(x => x.Id == id).FirstOrDefaultAsync();
 
-				if (dataFromDb == null) {
-					return new ApiResponse<EmployeeFamilyResponseDto> {
-						IsSuccess = false,
-						Message = Message.DATA_NOT_FOUND,
-					};
-				}
+				if (dataFromDb == null) return false;
 
 				_dbContext.EmployeeFamilies.Remove(dataFromDb);
 				await _dbContext.SaveChangesAsync();
 
-				return new ApiResponse<EmployeeFamilyResponseDto> {
-					IsSuccess = true,
-					Message = Message.DELETED_SUCCESS
-				};
-			} catch (Exception ex) {
-				return new ApiResponse<EmployeeFamilyResponseDto> {
-					IsSuccess = false,
-					Message = ex.Message
-				};
+				return true;
+			} catch (Exception) {
+				throw;
 			}
 		}
 

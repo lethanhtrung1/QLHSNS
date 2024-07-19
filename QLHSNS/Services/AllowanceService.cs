@@ -121,29 +121,18 @@ namespace QLHSNS.Services {
 			}
 		}
 
-		public async Task<ApiResponse<AllowanceResponseDto>> DeleteAsync(Guid id) {
+		public async Task<bool> DeleteAsync(Guid id) {
 			try {
 				var data = await _dbContext.Allowances.Where(x => x.Id == id).FirstOrDefaultAsync();
 
-				if (data == null) {
-					return new ApiResponse<AllowanceResponseDto>() {
-						IsSuccess = false,
-						Message = "Not fount"
-					};
-				}
+				if (data == null) return false;
 
 				_dbContext.Allowances.Remove(data);
 				await _dbContext.SaveChangesAsync();
 
-				return new ApiResponse<AllowanceResponseDto>() {
-					IsSuccess = true,
-					Message = "Deleted successfully"
-				};
-			} catch (Exception ex) {
-				return new ApiResponse<AllowanceResponseDto>() {
-					IsSuccess = false,
-					Message = ex.Message,
-				};
+				return true;
+			} catch (Exception) {
+				throw;
 			}
 		}
 

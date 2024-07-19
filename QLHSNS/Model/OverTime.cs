@@ -5,9 +5,10 @@ namespace QLHSNS.Model {
 		[Key]
 		public Guid Id { get; set; }
 		public Guid EmployeeId { get; set; }
-		public int Month { get; set; }
-		public int Year { get; set; }
+		//public int Month { get; set; }
+		//public int Year { get; set; }
 		public int TotalHour { get; set; }
+		public DateOnly OverTimeDate { get; set; }
 
 		public Employee Employee { get; set; }
 	}

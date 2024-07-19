@@ -18,14 +18,15 @@ namespace QLHSNS.Model {
 		public Guid? HealthCareId { get; set; }
 		public DateTime CreatedAt { get; set; }
 		public DateTime UpdatedAt { get; set; }
-
 		public Department Department { get; set; }
 		public JobTitle JobTitle { get; set; }
 		public Location? Location { get; set; }
 		public BankBranch? BankBranch { get; set; }
-		public List<OverTime> OverTimes { get; set; }
 		public List<EmployeeAsset>? EmployeeAssets { get; set; }
 		public List<EmployeeFamily>? EmployeeFamilies { get; set; }
 		public HealthCare? HealthCare { get; set; }
+		public virtual List<Contract> Contracts { get; set; }
+		public List<OverTime> OverTimes { get; set; }
+		public virtual List<Reward> Rewards { get; set; }
 	}
 }

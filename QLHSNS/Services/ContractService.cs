@@ -158,29 +158,20 @@ namespace QLHSNS.Services {
 			}
 		}
 
-		public async Task<ApiResponse<ContractResponseDto>> DeleteAsync(Guid id) {
+		public async Task<bool> DeleteAsync(Guid id) {
 			try {
 				var dataFromDb = await _dbContext.Contracts.Where(x => x.Id == id).FirstOrDefaultAsync();
 
 				if (dataFromDb == null) {
-					return new ApiResponse<ContractResponseDto> {
-						IsSuccess = false,
-						Message = Message.DATA_NOT_FOUND
-					};
+					return false;
 				}
 
 				_dbContext.Contracts.Remove(dataFromDb);
 				await _dbContext.SaveChangesAsync();
 
-				return new ApiResponse<ContractResponseDto> {
-					IsSuccess = true,
-					Message = "Deleted succesully"
-				};
-			} catch (Exception ex) {
-				return new ApiResponse<ContractResponseDto> {
-					IsSuccess = false,
-					Message = ex.Message
-				};
+				return true;
+			} catch (Exception) {
+				throw;
 			}
 		}
 

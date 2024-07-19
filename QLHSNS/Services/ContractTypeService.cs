@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using QLHSNS.Constants;
 using QLHSNS.Data;
 using QLHSNS.DTOs.Pagination;
 using QLHSNS.DTOs.Request.ContractType;
@@ -54,29 +55,15 @@ namespace QLHSNS.Services {
 			}
 		}
 
-		public async Task<ApiResponse<ContractType>> DeleteAsync(Guid id) {
-			try {
-				var data = await _dbContext.ContractTypes.Where(x => x.Id == id).FirstOrDefaultAsync();
-				if (data == null) {
-					return new ApiResponse<ContractType>() {
-						IsSuccess = false,
-						Message = "Not fount"
-					};
-				}
+		public async Task<bool> DeleteAsync(Guid id) {
+			var data = await _dbContext.ContractTypes.Where(x => x.Id == id).FirstOrDefaultAsync();
 
-				_dbContext.ContractTypes.Remove(data);
-				await _dbContext.SaveChangesAsync();
+			if (data == null) return false;
 
-				return new ApiResponse<ContractType>() {
-					IsSuccess = true,
-					Message = "Deleted successfully"
-				};
-			} catch (Exception ex) {
-				return new ApiResponse<ContractType>() {
-					IsSuccess = false,
-					Message = ex.Message,
-				};
-			}
+			_dbContext.ContractTypes.Remove(data);
+			await _dbContext.SaveChangesAsync();
+
+			return true;
 		}
 
 		public async Task<ApiResponse<ContractType>> DisableAsync(Guid id) {
@@ -140,7 +127,7 @@ namespace QLHSNS.Services {
 			}
 		}
 
-		public async Task<ApiResponse<PagedResult<ContractType>>> GetAsync(PagingRequestBase request) {
+		public async Task<ApiResponse<PagedResult<ContractType>>> GetPagingAsync(PagingRequestBase request) {
 			try {
 				var data = await _dbContext.ContractTypes.Where(x => x.Status == 1)
 									.Skip((request.PageNumber - 1) * request.PageSize)
@@ -225,6 +212,22 @@ namespace QLHSNS.Services {
 					Message = ex.Message,
 				};
 			}
+		}
+
+		public async Task<ApiResponse<List<ContractType>>> GetAllAsync() {
+			var data = await _dbContext.ContractTypes.Where(x => x.Status == 1).ToListAsync();
+
+			if (data == null || data.Count == 0) {
+				return new ApiResponse<List<ContractType>> {
+					IsSuccess = false,
+					Message = Message.DATA_NOT_FOUND
+				};
+			}
+
+			return new ApiResponse<List<ContractType>> {
+				IsSuccess = true,
+				Data = data,
+			};
 		}
 	}
 }

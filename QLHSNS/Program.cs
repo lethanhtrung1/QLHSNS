@@ -37,6 +37,7 @@ builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<IPayrollService, PayrollService>();
 builder.Services.AddScoped<IContractService, ContractService>();
 builder.Services.AddScoped<IEmployeeFamilyService, EmployeeFamilyService>();
+builder.Services.AddScoped<IRewardService, RewardService>();
 
 var app = builder.Build();
 

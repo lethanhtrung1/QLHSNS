@@ -1,5 +1,5 @@
-﻿namespace QLHSNS.Model {
-	public class Reward {
+﻿namespace QLHSNS.DTOs.Response.Reward {
+	public class RewardResponseDto {
 		public Guid Id { get; set; }
 		public Guid EmployeeId { get; set; }
 		public string? Description { get; set; }
@@ -9,7 +9,5 @@
 		public int IsReceived { get; set; } = 0;
 		public DateTime CreatedAt { get; set; }
 		public DateTime UpdatedAt { get; set; }
-		
-		public Employee Employee { get; set; }
 	}
 }

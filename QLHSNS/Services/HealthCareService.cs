@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using Azure.Core;
 using Microsoft.EntityFrameworkCore;
+using QLHSNS.Constants;
 using QLHSNS.Data;
 using QLHSNS.DTOs.Pagination;
 using QLHSNS.DTOs.Request.HealthCareRequestDto;
@@ -50,29 +50,18 @@ namespace QLHSNS.Services {
 			}
 		}
 
-		public async Task<ApiResponse<HealthCare>> DeleteHealthCareAsync(Guid id) {
+		public async Task<bool> DeleteHealthCareAsync(Guid id) {
 			try {
 				var dataFromDb = await _dbContext.HealthCares.Where(x => x.Id == id).FirstOrDefaultAsync();
 
-				if (dataFromDb == null) {
-					return new ApiResponse<HealthCare> {
-						IsSuccess = false,
-						Message = "Not fount"
-					};
-				}
+				if (dataFromDb == null) return false;
 
 				_dbContext.HealthCares.Remove(dataFromDb);
 				await _dbContext.SaveChangesAsync();
 
-				return new ApiResponse<HealthCare> {
-					IsSuccess = true,
-					Message = "Deleted successfully"
-				};
-			} catch (Exception ex) {
-				return new ApiResponse<HealthCare> {
-					IsSuccess = false,
-					Message = ex.Message
-				};
+				return true;
+			} catch (Exception) {
+				throw;
 			}
 		}
 
@@ -132,6 +121,29 @@ namespace QLHSNS.Services {
 				};
 			} catch (Exception ex) {
 				return new ApiResponse<HealthCare> {
+					IsSuccess = false,
+					Message = ex.Message
+				};
+			}
+		}
+
+		public async Task<ApiResponse<List<HealthCare>>> GetAllHealthCaresAsync() {
+			try {
+				var data = await _dbContext.HealthCares.Where(x => x.Status == 1).ToListAsync();
+
+				if(data == null || data.Count == 0) {
+					return new ApiResponse<List<HealthCare>> {
+						IsSuccess = false,
+						Message = Message.DATA_NOT_FOUND
+					};
+				}
+
+				return new ApiResponse<List<HealthCare>> {
+					IsSuccess = true,
+					Data = data,
+				};
+			} catch (Exception ex) {
+				return new ApiResponse<List<HealthCare>> {
 					IsSuccess = false,
 					Message = ex.Message
 				};

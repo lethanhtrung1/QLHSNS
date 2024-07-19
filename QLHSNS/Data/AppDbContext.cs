@@ -27,6 +27,7 @@ namespace QLHSNS.Data {
 		public DbSet<EmployeeAsset> EmployeeAssets { get; set; }
 		public DbSet<EmployeeFamily> EmployeeFamilies { get; set; }
 		public DbSet<Attachment> Attachments { get; set; }
+		public DbSet<Reward> Rewards { get; set; }
 
 		#endregion DbSet
 
@@ -54,5 +55,129 @@ namespace QLHSNS.Data {
 		//			new Allowance { Id = 3, AllowanceName = "Phụ cấp đào tạo", Description = "", Status = 1, Value = 2000000, Unit = "Month" }
 		//		);
 		//}
+
+		protected override void OnModelCreating(ModelBuilder modelBuilder) {
+			base.OnModelCreating(modelBuilder);
+
+			modelBuilder.Entity<DepartmentJobTitle>(entity => {
+				entity.HasOne(d => d.Department)
+					.WithMany(p => p.DepartmentJobTitles)
+					.HasForeignKey(d => d.DepartmentId)
+					.OnDelete(DeleteBehavior.NoAction);
+
+				entity.HasOne(d => d.JobTitle)
+					.WithMany(p => p.DepartmentJobTitles)
+					.HasForeignKey(d => d.JobTitleId)
+					.OnDelete(DeleteBehavior.NoAction);
+			});
+
+			modelBuilder.Entity<PayrollAllowance>(entity => {
+				entity.HasOne(d => d.Payroll)
+					.WithMany(p => p.PayrollAllowances)
+					.HasForeignKey(d => d.PayrollId)
+					.OnDelete(DeleteBehavior.NoAction);
+
+				entity.HasOne(d => d.Allowance)
+					.WithMany(p => p.PayrollAllowances)
+					.HasForeignKey(d => d.AllowanceId)
+					.OnDelete(DeleteBehavior.NoAction);
+			});
+
+			modelBuilder.Entity<PayrollBenefit>(entity => {
+				entity.HasOne(d => d.Payroll)
+					.WithMany(p => p.PayrollBenefits)
+					.HasForeignKey(d => d.PayrollId)
+					.OnDelete(DeleteBehavior.NoAction);
+
+				entity.HasOne(d => d.Benefit)
+					.WithMany(p => p.PayrollBenefits)
+					.HasForeignKey(d => d.BenefitId)
+					.OnDelete(DeleteBehavior.NoAction);
+			});
+
+			modelBuilder.Entity<BankBranch>(entity => {
+				entity.HasOne(d => d.Bank)
+					.WithMany(p => p.BankBranches)
+					.HasForeignKey(d => d.BankId)
+					.OnDelete(DeleteBehavior.Restrict);
+			});
+
+			modelBuilder.Entity<EmployeeAsset>(entity => {
+				entity.HasOne(d => d.Asset)
+					.WithMany(p => p.EmployeeAssets)
+					.HasForeignKey(d => d.AssetId)
+					.OnDelete(DeleteBehavior.NoAction);
+
+				entity.HasOne(d => d.Employee)
+					.WithMany(p => p.EmployeeAssets)
+					.HasForeignKey(d => d.EmployeeId)
+					.OnDelete(DeleteBehavior.NoAction);
+			});
+
+			modelBuilder.Entity<EmployeeFamily>(entity => {
+				entity.HasOne(d => d.Employee)
+					.WithMany(p => p.EmployeeFamilies)
+					.HasForeignKey(d => d.EmployeeId)
+					.OnDelete(DeleteBehavior.NoAction);
+			});
+
+			modelBuilder.Entity<Employee>(entity => {
+				entity.HasOne(d => d.Department)
+					.WithMany(p => p.Employees)
+					.HasForeignKey(x => x.DepartmentId)
+					.OnDelete(DeleteBehavior.NoAction);
+
+				entity.HasOne(d => d.JobTitle)
+					.WithMany(p => p.Employees)
+					.HasForeignKey(d => d.JobTitleId)
+					.OnDelete(DeleteBehavior.NoAction);
+
+				entity.HasOne(d => d.BankBranch)
+					.WithMany()
+					.HasForeignKey(d => d.BankBranchId)
+					.OnDelete(DeleteBehavior.NoAction);
+
+				entity.HasOne(d => d.Location)
+					.WithMany()
+					.HasForeignKey(d => d.LocationId)
+					.OnDelete(DeleteBehavior.NoAction);
+
+				entity.HasOne(d => d.HealthCare)
+					.WithMany()
+					.HasForeignKey(d => d.HealthCareId)
+					.OnDelete(DeleteBehavior.NoAction);
+			});
+
+			modelBuilder.Entity<Contract>(entity => {
+				entity.HasOne(d => d.ContractType)
+					.WithMany()
+					.HasForeignKey(d => d.ContractTypeId)
+					.OnDelete(DeleteBehavior.NoAction);
+
+				entity.HasOne(d => d.Employee)
+					.WithMany(p => p.Contracts)
+					.HasForeignKey(d => d.EmployeeId)
+					.OnDelete(DeleteBehavior.Restrict);
+
+				entity.HasOne(d => d.Payroll)
+					.WithMany(p => p.Contracts)
+					.HasForeignKey(d => d.PayrollId)
+					.OnDelete(DeleteBehavior.Restrict);
+			});
+
+			modelBuilder.Entity<Reward>(entity => {
+				entity.HasOne(d => d.Employee)
+					.WithMany(p => p.Rewards)
+					.HasForeignKey(d => d.EmployeeId)
+					.OnDelete(DeleteBehavior.Restrict);
+			});
+
+			modelBuilder.Entity<OverTime>(entity => {
+				entity.HasOne(d => d.Employee)
+					.WithMany(p => p.OverTimes)
+					.HasForeignKey(d => d.EmployeeId)
+					.OnDelete(DeleteBehavior.Restrict);
+			});
+		}
 	}
 }

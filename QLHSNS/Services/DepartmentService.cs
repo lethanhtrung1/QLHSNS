@@ -122,36 +122,22 @@ namespace QLHSNS.Services {
 			}
 		}
 
-		public async Task<ApiResponse<DepartmentResponseDto>> DeleteDepartmentAsync(Guid id) {
-			try {
-				var dataFromDb = await _dbContext.Departments.Where(x => x.Id == id).FirstOrDefaultAsync();
-				if (dataFromDb == null) {
-					return new ApiResponse<DepartmentResponseDto>() {
-						IsSuccess = false,
-						Message = "Not found"
-					};
-				}
+		public async Task<bool> DeleteDepartmentAsync(Guid id) {
+			var dataFromDb = await _dbContext.Departments.Where(x => x.Id == id).FirstOrDefaultAsync();
 
-				var departmentJobTitle = await _dbContext.DepartmentJobTitles.Where(x => x.DepartmentId == id).ToListAsync();
+			if (dataFromDb == null) return false;
 
-				foreach (var item in departmentJobTitle) {
-					_dbContext.DepartmentJobTitles.Remove(item);
-				}
+			var departmentJobTitle = await _dbContext.DepartmentJobTitles.Where(x => x.DepartmentId == id).ToListAsync();
 
-				_dbContext.Departments.Remove(dataFromDb);
-
-				await _dbContext.SaveChangesAsync();
-
-				return new ApiResponse<DepartmentResponseDto>() {
-					IsSuccess = true,
-					Message = "Deleted successfully"
-				};
-			} catch (Exception ex) {
-				return new ApiResponse<DepartmentResponseDto>() {
-					IsSuccess = false,
-					Message = ex.Message
-				};
+			foreach (var item in departmentJobTitle) {
+				_dbContext.DepartmentJobTitles.Remove(item);
 			}
+
+			_dbContext.Departments.Remove(dataFromDb);
+
+			await _dbContext.SaveChangesAsync();
+
+			return true;
 		}
 
 		public async Task<ApiResponse<DepartmentResponseDto>> DisableDepartmentAsync(Guid id) {
@@ -222,7 +208,7 @@ namespace QLHSNS.Services {
 			try {
 				var data = await _dbContext.Departments.Where(x => x.Status == 1).ToListAsync();
 
-				if(data == null || data.Count == 0) {
+				if (data == null || data.Count == 0) {
 					return new ApiResponse<List<DepartmentBaseResponseDto>> {
 						IsSuccess = false,
 						Message = "No data"
@@ -348,7 +334,7 @@ namespace QLHSNS.Services {
 					departments.Status = request.Status;
 					departments.UpdatedAt = DateTime.Now;
 
-					if(request.JobTitleIds != null && request.JobTitleIds.Count > 0) {
+					if (request.JobTitleIds != null && request.JobTitleIds.Count > 0) {
 						var currentJobTitleIds = departments.DepartmentJobTitles.Select(x => x.JobTitleId).ToList();
 						var jobTitlesToRemove = currentJobTitleIds.Except(request.JobTitleIds).ToList();
 						var jobTitlesToAdd = request.JobTitleIds.Except(currentJobTitleIds).ToList();
@@ -437,12 +423,12 @@ namespace QLHSNS.Services {
 					var query = _dbContext.DepartmentJobTitles.Where(x => x.Id == request.DepartmentId);
 					var jobTitles = _dbContext.JobTitles.Where(x => x.Status == 1);
 					var result = await (from q in query
-									  join j in jobTitles on q.JobTitleId equals j.Id into temp
-									  from t in temp.DefaultIfEmpty()
-									  select new DepartmentJobTitleResponseDto {
-										  Id = t.Id,
-										  Name = t.JobTitleName
-									  }).ToListAsync();
+										join j in jobTitles on q.JobTitleId equals j.Id into temp
+										from t in temp.DefaultIfEmpty()
+										select new DepartmentJobTitleResponseDto {
+											Id = t.Id,
+											Name = t.JobTitleName
+										}).ToListAsync();
 
 					return new ApiResponse<List<DepartmentJobTitleResponseDto>> {
 						Data = result,

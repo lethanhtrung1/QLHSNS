@@ -14,5 +14,6 @@ namespace QLHSNS.Model {
 
 		public List<PayrollAllowance> PayrollAllowances { get; set; }
 		public List<PayrollBenefit> PayrollBenefits { get; set; }
+		public virtual List<Contract> Contracts { get; set; }
 	}
 }

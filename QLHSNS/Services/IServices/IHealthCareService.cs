@@ -9,8 +9,9 @@ namespace QLHSNS.Services.IServices {
 		Task<ApiResponse<PagedResult<HealthCare>>> GetHealthCaresAsync(PagingRequestBase request);
 		Task<ApiResponse<HealthCare>> CreateHealthCareAsync(CreateHealthCareRequestDto request);
 		Task<ApiResponse<HealthCare>> UpdateHealthCareAsync(UpdateHealthCareRequestDto request);
-		Task<ApiResponse<HealthCare>> DeleteHealthCareAsync(Guid id);
+		Task<bool> DeleteHealthCareAsync(Guid id);
 		Task<ApiResponse<HealthCare>> EnableHealthCareAsync(Guid id);
 		Task<ApiResponse<HealthCare>> DisableHealthCareAsync(Guid id);
+		Task<ApiResponse<List<HealthCare>>> GetAllHealthCaresAsync();
 	}
 }
