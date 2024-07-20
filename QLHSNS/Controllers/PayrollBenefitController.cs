@@ -22,4 +22,5 @@ namespace QLHSNS.Controllers {
 			var result = await _service.RemovePayrollBenefits(payrollId, benefitIds);
 			return result ? Ok() : BadRequest();
 		}
+	}
 }
