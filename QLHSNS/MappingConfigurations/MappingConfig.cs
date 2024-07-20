@@ -28,52 +28,44 @@ namespace QLHSNS.MappingConfigurations {
 	public class MappingConfig {
 		public static MapperConfiguration RegisterMaps() {
 			var mappingConfig = new MapperConfiguration(config => {
-				config.CreateMap<JobTitle, CreateJobTitleRequestDto>().ReverseMap();
-				config.CreateMap<JobTitle, JobTitleResponseDto>().ReverseMap();
 
-				config.CreateMap<ContractType, CreateContractTypeRequestDto>().ReverseMap();
-				config.CreateMap<ContractType, UpdateContractTypeRequestDto>().ReverseMap();
+				#region Domain to Response
 
-				config.CreateMap<Allowance, CreateAllowanceRequestDto>().ReverseMap();
-				config.CreateMap<Allowance, AllowanceResponseDto>().ReverseMap();
-
-				config.CreateMap<Benefit, CreateBenefitRequestDto>().ReverseMap();
-				config.CreateMap<Benefit, BenefitResponseDto>().ReverseMap();
-
-				config.CreateMap<Department, CreateDepartmentRequestDto>().ReverseMap();
-				config.CreateMap<Department, DepartmentResponseDto>().ReverseMap();
-				config.CreateMap<Department, DepartmentBaseResponseDto>().ReverseMap();
-				config.CreateMap<DepartmentJobTitle, DepartmentJobTitleDto>().ReverseMap();
-
-				config.CreateMap<Employee, CreateEmployeeRequestDto>().ReverseMap();
-				config.CreateMap<Employee, EmployeeResponseDto>().ReverseMap();
-				config.CreateMap<EmployeeAsset, EmployeeAssetDto>().ReverseMap();
-
-				config.CreateMap<HealthCare, CreateHealthCareRequestDto>().ReverseMap();
-
-				config.CreateMap<Bank, BankResponseDto>().ReverseMap();
-
-				config.CreateMap<BankBranch, BankBranchResponseDto>().ReverseMap();
-				config.CreateMap<BankBranch, BankBranchDto>().ReverseMap();
-
-				config.CreateMap<Asset, AssetResponseDto>().ReverseMap();
-				config.CreateMap<Asset, CreateAssetRequestDto>().ReverseMap();
-
-				config.CreateMap<Payroll, PayrollResponseDto>().ReverseMap();
-				config.CreateMap<Payroll, CreatePayrollRequestDto>().ReverseMap();
-				config.CreateMap<PayrollAllowance, PayrollAllowaceRequestDto>().ReverseMap();
-				config.CreateMap<PayrollBenefit, PayrollBenefitRequestDto>().ReverseMap();
-
-				config.CreateMap<Contract, ContractResponseDto>().ReverseMap();
-				config.CreateMap<Contract, CreateContractRequestDto>().ReverseMap();
-				config.CreateMap<Attachment, AttachmentResponseDto>().ReverseMap();
-
-				config.CreateMap<EmployeeFamily, EmployeeFamilyResponseDto>().ReverseMap();
-
-				// Domain to Response
 				config.CreateMap<Reward, RewardResponseDto>();
 
-				// Request to Domain
+				config.CreateMap<EmployeeFamily, EmployeeFamilyResponseDto>();
+
+				config.CreateMap<JobTitle, JobTitleResponseDto>();
+
+				config.CreateMap<Allowance, AllowanceResponseDto>();
+
+				config.CreateMap<Benefit, BenefitResponseDto>();
+
+				config.CreateMap<Department, DepartmentResponseDto>();
+				config.CreateMap<Department, DepartmentBaseResponseDto>();
+
+
+				config.CreateMap<Employee, EmployeeResponseDto>();
+				config.CreateMap<EmployeeAsset, EmployeeAssetDto>();
+
+				config.CreateMap<Bank, BankResponseDto>();
+
+				config.CreateMap<BankBranch, BankBranchResponseDto>();
+				config.CreateMap<BankBranch, BankBranchDto>();
+
+				config.CreateMap<Asset, AssetResponseDto>();
+
+				config.CreateMap<Payroll, PayrollResponseDto>();
+
+				config.CreateMap<Contract, ContractResponseDto>();
+				config.CreateMap<Attachment, AttachmentResponseDto>();
+
+				#endregion
+
+
+
+				#region Request to Domain
+
 				config.CreateMap<CreateRewardRequestDto, Reward>()
 					.ForMember(
 						dest => dest.IsReceived,
@@ -84,6 +76,54 @@ namespace QLHSNS.MappingConfigurations {
 					.ForMember(
 						dest => dest.UpdatedAt,
 						opt => opt.MapFrom(src => DateTime.Now));
+
+				config.CreateMap<CreateJobTitleRequestDto, JobTitle>()
+					.ForMember(
+						dest => dest.Status,
+						opt => opt.MapFrom(src => 1));
+
+				config.CreateMap<CreateContractTypeRequestDto, ContractType>()
+					.ForMember(
+							dest => dest.Status,
+							opt => opt.MapFrom(src => 1));
+
+				config.CreateMap<CreateAllowanceRequestDto, Allowance>()
+					.ForMember(
+						dest => dest.Status,
+						opt => opt.MapFrom(src => 1));
+
+				config.CreateMap<CreateBenefitRequestDto, Benefit>()
+					.ForMember(
+						dest => dest.Status,
+						opt => opt.MapFrom(src => 1));
+
+				config.CreateMap<CreateDepartmentRequestDto, Department>()
+					.ForMember(dest => dest.Status, opt => opt.MapFrom(src => 1));
+
+				config.CreateMap<CreateDepartmentJobTitleDto, DepartmentJobTitle>();
+
+				config.CreateMap<CreateEmployeeRequestDto, Employee>();
+
+				config.CreateMap<CreateHealthCareRequestDto, HealthCare>()
+					.ForMember(dest => dest.Status, opt => opt.MapFrom(src => 1));
+
+				config.CreateMap<CreateAssetRequestDto, Asset>()
+					.ForMember(dest => dest.Status, opt => opt.MapFrom(src => 1));
+
+				config.CreateMap<CreatePayrollRequestDto, Payroll>()
+					.ForMember(
+						dest => dest.Status,
+						opt => opt.MapFrom(src => 1));
+
+				config.CreateMap<PayrollAllowaceDto, PayrollAllowance>();
+				config.CreateMap<PayrollBenefitDto, PayrollBenefit>();
+
+				config.CreateMap<CreateContractRequestDto, Contract>()
+					.ForMember(
+						dest => dest.IsDeleted,
+						opt => opt.MapFrom(src => 0));
+
+				#endregion
 			});
 
 			return mappingConfig;

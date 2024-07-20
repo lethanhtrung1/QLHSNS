@@ -38,6 +38,8 @@ builder.Services.AddScoped<IPayrollService, PayrollService>();
 builder.Services.AddScoped<IContractService, ContractService>();
 builder.Services.AddScoped<IEmployeeFamilyService, EmployeeFamilyService>();
 builder.Services.AddScoped<IRewardService, RewardService>();
+builder.Services.AddScoped<IPayrollAllowanceService, PayrollAllowanceService>();
+builder.Services.AddScoped<IPayrollBenefitService, PayrollBenefitService>();
 
 var app = builder.Build();
 

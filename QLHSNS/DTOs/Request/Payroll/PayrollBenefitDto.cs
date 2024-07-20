@@ -1,6 +1,6 @@
 ﻿namespace QLHSNS.DTOs.Request.Payroll {
-	public class PayrollAllowaceRequestDto {
+	public class PayrollBenefitDto {
 		public Guid PayrollId { get; set; }
-		public Guid AllowaceId { get; set; }
+		public Guid BenefitId { get; set; }
 	}
 }

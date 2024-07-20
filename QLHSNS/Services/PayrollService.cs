@@ -32,7 +32,7 @@ namespace QLHSNS.Services {
 						foreach (var item in request.AllowaceIds!) {
 							// if Allowace.Status == 1
 							if (_dbContext.Allowances.Where(x => x.Id == item).Select(x => x.Status).FirstOrDefault() == 1) {
-								var payrollAllowace = new PayrollAllowaceRequestDto() {
+								var payrollAllowace = new PayrollAllowaceDto() {
 									PayrollId = newPayroll.Id,
 									AllowaceId = item
 								};
@@ -53,7 +53,7 @@ namespace QLHSNS.Services {
 						foreach (var item in request.BennefitIds!) {
 							// if Benefit.Status == 1
 							if (_dbContext.Benefits.Where(x => x.Id == item).Select(x => x.Status).FirstOrDefault() == 1) {
-								var payrollBenefit = new PayrollBenefitRequestDto() {
+								var payrollBenefit = new PayrollBenefitDto() {
 									PayrollId = newPayroll.Id,
 									BenefitId = item
 								};
@@ -421,7 +421,7 @@ namespace QLHSNS.Services {
 						}
 
 						foreach (var item in allowanceToAdd) {
-							var newPayrollAllowanceDto = new PayrollAllowaceRequestDto {
+							var newPayrollAllowanceDto = new PayrollAllowaceDto {
 								PayrollId = request.Id,
 								AllowaceId = item
 							};
@@ -451,7 +451,7 @@ namespace QLHSNS.Services {
 						}
 
 						foreach (var item in benefitToAdd) {
-							var newPayrollBenefitDto = new PayrollBenefitRequestDto {
+							var newPayrollBenefitDto = new PayrollBenefitDto {
 								PayrollId = request.Id,
 								BenefitId = item
 							};

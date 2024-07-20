@@ -3,7 +3,6 @@
 		public Guid ContractTypeId { get; set; }
 		public Guid EmployeeId { get; set; }
 		public Guid PayrollId { get; set; }
-		public int IsDeleted { get; set; } = 0;
 		public DateTime StartDate { get; set; }
 		public DateTime EndDate { get; set; }
 

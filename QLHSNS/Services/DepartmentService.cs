@@ -23,7 +23,7 @@ namespace QLHSNS.Services {
 				if (request != null) {
 					if (request.JobTitleIds != null && request.JobTitleIds.Count > 0) {
 						foreach (var item in request.JobTitleIds) {
-							var dataDto = new DepartmentJobTitleDto {
+							var dataDto = new CreateDepartmentJobTitleDto {
 								DepartmentId = request.DepartmentId,
 								JobTitleId = item
 							};
@@ -77,13 +77,15 @@ namespace QLHSNS.Services {
 					var newDepartment = _mapper.Map<Department>(request);
 					await _dbContext.Departments.AddAsync(newDepartment);
 
-					foreach (var item in request.JobTitleIds) {
-						var dataDto = new DepartmentJobTitleDto {
-							DepartmentId = newDepartment.Id,
-							JobTitleId = item
-						};
-						var data = _mapper.Map<DepartmentJobTitle>(dataDto);
-						await _dbContext.DepartmentJobTitles.AddAsync(data);
+					if(request.JobTitleIds != null && request.JobTitleIds.Count >  0) {
+						foreach (var item in request.JobTitleIds) {
+							var dataDto = new CreateDepartmentJobTitleDto {
+								DepartmentId = newDepartment.Id,
+								JobTitleId = item
+							};
+							var data = _mapper.Map<DepartmentJobTitle>(dataDto);
+							await _dbContext.DepartmentJobTitles.AddAsync(data);
+						}
 					}
 
 					await _dbContext.SaveChangesAsync();
@@ -347,7 +349,7 @@ namespace QLHSNS.Services {
 						}
 
 						foreach (var item in jobTitlesToAdd) {
-							var newDepartmentJobTitleDto = new DepartmentJobTitleDto {
+							var newDepartmentJobTitleDto = new CreateDepartmentJobTitleDto {
 								DepartmentId = request.Id,
 								JobTitleId = item
 							};
@@ -410,7 +412,7 @@ namespace QLHSNS.Services {
 					}
 
 					foreach (var item in jobTitlesToAdd) {
-						var newDepartmentJobTitleDto = new DepartmentJobTitleDto {
+						var newDepartmentJobTitleDto = new CreateDepartmentJobTitleDto {
 							DepartmentId = request.DepartmentId,
 							JobTitleId = item
 						};
