@@ -5,6 +5,7 @@ using QLHSNS.DTOs.Request.Benefit;
 using QLHSNS.DTOs.Request.Contract;
 using QLHSNS.DTOs.Request.ContractType;
 using QLHSNS.DTOs.Request.Department;
+using QLHSNS.DTOs.Request.EmployeeFamily;
 using QLHSNS.DTOs.Request.EmployeeRequestDto;
 using QLHSNS.DTOs.Request.HealthCareRequestDto;
 using QLHSNS.DTOs.Request.JobTitle;
@@ -59,6 +60,13 @@ namespace QLHSNS.MappingConfigurations {
 
 				config.CreateMap<Contract, ContractResponseDto>();
 				config.CreateMap<Attachment, AttachmentResponseDto>();
+
+				config.CreateMap<EmployeeFamilyDetail, EmployeeFamilyDetailResponseDto>();
+
+				config.CreateMap<EmployeeFamily, GetEmployeeFamilyWithDetailResponseDto>()
+					.ForMember(
+						dest => dest.FamilyDetails,
+						opt => opt.MapFrom(src => new List<EmployeeFamilyDetailResponseDto>()));
 
 				#endregion
 
@@ -122,6 +130,8 @@ namespace QLHSNS.MappingConfigurations {
 					.ForMember(
 						dest => dest.IsDeleted,
 						opt => opt.MapFrom(src => 0));
+
+				config.CreateMap<AddEmployeeFamilyDetailRequestDto, EmployeeFamilyDetail>();
 
 				#endregion
 			});

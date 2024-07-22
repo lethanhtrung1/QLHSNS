@@ -26,6 +26,7 @@ namespace QLHSNS.Data {
 		public DbSet<Asset> Assets { get; set; }
 		public DbSet<EmployeeAsset> EmployeeAssets { get; set; }
 		public DbSet<EmployeeFamily> EmployeeFamilies { get; set; }
+		public DbSet<EmployeeFamilyDetail> EmployeeFamilyDetails { get; set; }
 		public DbSet<Attachment> Attachments { get; set; }
 		public DbSet<Reward> Rewards { get; set; }
 
@@ -116,8 +117,15 @@ namespace QLHSNS.Data {
 
 			modelBuilder.Entity<EmployeeFamily>(entity => {
 				entity.HasOne(d => d.Employee)
-					.WithMany(p => p.EmployeeFamilies)
-					.HasForeignKey(d => d.EmployeeId)
+					.WithOne(p => p.EmployeeFamily)
+					.HasForeignKey<EmployeeFamily>(d => d.EmployeeId)
+					.OnDelete(DeleteBehavior.NoAction);
+			});
+
+			modelBuilder.Entity<EmployeeFamilyDetail>(entity => {
+				entity.HasOne(d => d.EmployeeFamily)
+					.WithMany(p => p.EmployeeFamilyDetails)
+					.HasForeignKey(d => d.EmployeeFamilyId)
 					.OnDelete(DeleteBehavior.NoAction);
 			});
 

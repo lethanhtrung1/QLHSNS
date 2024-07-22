@@ -23,7 +23,7 @@ namespace QLHSNS.Model {
 		public Location? Location { get; set; }
 		public BankBranch? BankBranch { get; set; }
 		public List<EmployeeAsset>? EmployeeAssets { get; set; }
-		public List<EmployeeFamily>? EmployeeFamilies { get; set; }
+		public EmployeeFamily? EmployeeFamily { get; set; }
 		public HealthCare? HealthCare { get; set; }
 		public virtual List<Contract> Contracts { get; set; }
 		public List<OverTime> OverTimes { get; set; }

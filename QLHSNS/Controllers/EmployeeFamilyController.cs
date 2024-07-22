@@ -21,7 +21,7 @@ namespace QLHSNS.Controllers {
 		}
 
 		[HttpGet("GetByEmployeeId/{id:Guid}")]
-		public async Task<ApiResponse<List<EmployeeFamilyResponseDto>>> GetByEmployeeId(Guid id) {
+		public async Task<ApiResponse<GetEmployeeFamilyWithDetailResponseDto>> GetByEmployeeId(Guid id) {
 			return await _service.GetByEmployeeIdAsync(id);
 		}
 
@@ -33,6 +33,11 @@ namespace QLHSNS.Controllers {
 		[HttpPut("Update")]
 		public async Task<ApiResponse<EmployeeFamilyResponseDto>> Update(UpdateEmployeeFamilyRequestDto request) {
 			return await _service.UpdateAsync(request);
+		}
+
+		[HttpPost("AddFamilyDetail")]
+		public async Task<ApiResponse<EmployeeFamilyDetailResponseDto>> AddEmployeeFamilyDetatil(AddEmployeeFamilyDetailRequestDto request) {
+			return await _service.AddEmployeeFamilyDetail(request);
 		}
 	}
 }

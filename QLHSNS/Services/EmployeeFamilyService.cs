@@ -18,11 +18,50 @@ namespace QLHSNS.Services {
 			_mapper = mapper;
 		}
 
+		public async Task<ApiResponse<EmployeeFamilyDetailResponseDto>> AddEmployeeFamilyDetail(AddEmployeeFamilyDetailRequestDto request) {
+			try {
+				if (request != null) {
+					var checkEmployeeFamily = await _dbContext.EmployeeFamilies.Where(x => x.Id == request.EmployeeFamilyId).FirstOrDefaultAsync();
+
+					if(checkEmployeeFamily == null) {
+						return new ApiResponse<EmployeeFamilyDetailResponseDto> {
+							IsSuccess = false,
+							Message = "Employee family not found"
+						};
+					}
+
+					var newFamilyDetail = _mapper.Map<EmployeeFamilyDetail>(request);
+
+					await _dbContext.EmployeeFamilyDetails.AddAsync(newFamilyDetail);
+					await _dbContext.SaveChangesAsync();
+
+					var query = await _dbContext.EmployeeFamilyDetails.FirstOrDefaultAsync(x => x.Id == newFamilyDetail.Id);
+					var result = _mapper.Map<EmployeeFamilyDetailResponseDto>(query);
+
+					return new ApiResponse<EmployeeFamilyDetailResponseDto> {
+						IsSuccess = true,
+						Data = result,
+						Message = "Add new Employee Family successfully"
+					};
+				}
+
+				return new ApiResponse<EmployeeFamilyDetailResponseDto> {
+					IsSuccess = false,
+					Message = Message.INVALID_PAYLOAD
+				};
+			} catch (Exception ex) {
+				return new ApiResponse<EmployeeFamilyDetailResponseDto> {
+					IsSuccess = false,
+					Message = ex.Message
+				};
+			}
+		}
+
 		public async Task<ApiResponse<EmployeeFamilyResponseDto>> CreateAsync(CreateEmployeeFamilyRequestDto request) {
 			try {
 				if (request != null) {
 					var checkEmployeeFamily = await _dbContext.EmployeeFamilies
-						.Where(x => x.EmployeeId == request.EmployeeId && x.Name == request.Name).ToListAsync();
+						.Where(x => x.EmployeeId == request.EmployeeId).ToListAsync();
 
 					if (checkEmployeeFamily != null) {
 						return new ApiResponse<EmployeeFamilyResponseDto> {
@@ -34,11 +73,8 @@ namespace QLHSNS.Services {
 					var newEmployeeFamily = new EmployeeFamily {
 						Id = Guid.NewGuid(),
 						EmployeeId = request.EmployeeId,
-						Name = request.Name,
-						DateOfBirth = request.DateOfBirth,
-						PhoneNumber = request.PhoneNumber,
-						Relationship = request.Relationship,
-						Occupation = request.Occupation,
+						Deduction = request.Deduction,
+						EffectiveDate = request.EffectiveDate,
 					};
 
 					await _dbContext.EmployeeFamilies.AddAsync(newEmployeeFamily);
@@ -61,17 +97,16 @@ namespace QLHSNS.Services {
 			}
 		}
 
-		public Task<ApiResponse<EmployeeFamilyResponseDto>> CreateRangeAsync(List<CreateEmployeeFamilyRequestDto> request) {
-			throw new NotImplementedException();
-		}
-
 		public async Task<bool> DeleteAsync(Guid id) {
 			try {
-				var dataFromDb = await _dbContext.EmployeeFamilies.Where(x => x.Id == id).FirstOrDefaultAsync();
+				var employeeFamily = await _dbContext.EmployeeFamilies.Where(x => x.Id == id).FirstOrDefaultAsync();
 
-				if (dataFromDb == null) return false;
+				if (employeeFamily == null) return false;
 
-				_dbContext.EmployeeFamilies.Remove(dataFromDb);
+				var employeeFamilyDetails = await _dbContext.EmployeeFamilyDetails.Where(x => x.EmployeeFamilyId == id).ToListAsync();
+
+				_dbContext.EmployeeFamilyDetails.RemoveRange(employeeFamilyDetails);
+				_dbContext.EmployeeFamilies.Remove(employeeFamily);
 				await _dbContext.SaveChangesAsync();
 
 				return true;
@@ -80,25 +115,30 @@ namespace QLHSNS.Services {
 			}
 		}
 
-		public async Task<ApiResponse<List<EmployeeFamilyResponseDto>>> GetByEmployeeIdAsync(Guid id) {
+		public async Task<ApiResponse<GetEmployeeFamilyWithDetailResponseDto>> GetByEmployeeIdAsync(Guid id) {
 			try {
-				var data = await _dbContext.EmployeeFamilies.Where(x => x.EmployeeId == id).ToListAsync();
+				var data = await _dbContext.EmployeeFamilies.Where(x => x.EmployeeId == id).FirstOrDefaultAsync();
 
-				if (data == null || data.Count == 0) {
-					return new ApiResponse<List<EmployeeFamilyResponseDto>> {
+				if (data == null) {
+					return new ApiResponse<GetEmployeeFamilyWithDetailResponseDto> {
 						IsSuccess = false,
 						Message = Message.DATA_NOT_FOUND
 					};
 				}
 
-				var result = _mapper.Map<List<EmployeeFamilyResponseDto>>(data).ToList();
+				var result = _mapper.Map<GetEmployeeFamilyWithDetailResponseDto>(data);
 
-				return new ApiResponse<List<EmployeeFamilyResponseDto>> {
+				var query = await _dbContext.EmployeeFamilyDetails.Where(x => x.EmployeeFamilyId == data.Id).ToListAsync();
+				var familyDetails = _mapper.Map<List<EmployeeFamilyDetailResponseDto>>(query);
+
+				result.FamilyDetails = familyDetails;
+
+				return new ApiResponse<GetEmployeeFamilyWithDetailResponseDto> {
 					IsSuccess = true,
 					Data = result
 				};
 			} catch (Exception ex) {
-				return new ApiResponse<List<EmployeeFamilyResponseDto>> {
+				return new ApiResponse<GetEmployeeFamilyWithDetailResponseDto> {
 					IsSuccess = false,
 					Message = ex.Message
 				};
@@ -117,20 +157,11 @@ namespace QLHSNS.Services {
 						};
 					}
 
-					if (!string.IsNullOrWhiteSpace(request.Name))
-						dataFromDb.Name = request.Name;
+					if (request.EffectiveDate != default(DateTime))
+						dataFromDb.EffectiveDate = request.EffectiveDate;
 
-					if (request.DateOfBirth != default(DateTime))
-						dataFromDb.DateOfBirth = request.DateOfBirth;
-
-					if (!string.IsNullOrWhiteSpace(request.PhoneNumber))
-						dataFromDb.PhoneNumber = request.PhoneNumber;
-
-					if (!string.IsNullOrWhiteSpace(request.Relationship))
-						dataFromDb.Relationship = request.Relationship;
-
-					if (!string.IsNullOrWhiteSpace(request.Occupation))
-						dataFromDb.Occupation = request.Occupation;
+					if (request.Deduction == 0 || request.Deduction == 1)
+						dataFromDb.Deduction = request.Deduction;
 
 					if (request.EmployeeId.HasValue)
 						dataFromDb.EmployeeId = request.EmployeeId.Value;
@@ -157,10 +188,6 @@ namespace QLHSNS.Services {
 					Message = ex.Message
 				};
 			}
-		}
-
-		public Task<ApiResponse<EmployeeFamilyResponseDto>> UpdateRangeAsync(List<UpdateEmployeeFamilyRequestDto> request) {
-			throw new NotImplementedException();
 		}
 	}
 }
