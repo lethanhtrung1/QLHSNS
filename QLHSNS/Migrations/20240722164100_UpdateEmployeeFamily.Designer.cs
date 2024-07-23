@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using QLHSNS.Data;
 
@@ -11,9 +12,11 @@ using QLHSNS.Data;
 namespace QLHSNS.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240722164100_UpdateEmployeeFamily")]
+    partial class UpdateEmployeeFamily
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -336,9 +339,6 @@ namespace QLHSNS.Migrations
 
                     b.Property<Guid?>("HealthCareId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("IsWorking")
-                        .HasColumnType("int");
 
                     b.Property<Guid>("JobTitleId")
                         .HasColumnType("uniqueidentifier");
@@ -802,7 +802,7 @@ namespace QLHSNS.Migrations
                     b.HasOne("QLHSNS.Model.Employee", "Employee")
                         .WithOne("EmployeeFamily")
                         .HasForeignKey("QLHSNS.Model.EmployeeFamily", "EmployeeId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Employee");

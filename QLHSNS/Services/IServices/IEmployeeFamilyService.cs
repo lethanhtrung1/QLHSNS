@@ -10,5 +10,7 @@ namespace QLHSNS.Services.IServices {
 		Task<ApiResponse<EmployeeFamilyResponseDto>> UpdateAsync(UpdateEmployeeFamilyRequestDto request);
 
 		Task<ApiResponse<EmployeeFamilyDetailResponseDto>> AddEmployeeFamilyDetail(AddEmployeeFamilyDetailRequestDto request);
+		Task<ApiResponse<EmployeeFamilyDetailResponseDto>> UpdateEmployeeFamilyDetail(UpdateEmployeeFamilyDetailRequestDto request);
+		Task<bool> RemoveEmployeeFamilyDetail(Guid id);
 	}
 }

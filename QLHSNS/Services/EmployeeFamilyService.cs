@@ -23,7 +23,7 @@ namespace QLHSNS.Services {
 				if (request != null) {
 					var checkEmployeeFamily = await _dbContext.EmployeeFamilies.Where(x => x.Id == request.EmployeeFamilyId).FirstOrDefaultAsync();
 
-					if(checkEmployeeFamily == null) {
+					if (checkEmployeeFamily == null) {
 						return new ApiResponse<EmployeeFamilyDetailResponseDto> {
 							IsSuccess = false,
 							Message = "Employee family not found"
@@ -80,8 +80,12 @@ namespace QLHSNS.Services {
 					await _dbContext.EmployeeFamilies.AddAsync(newEmployeeFamily);
 					await _dbContext.SaveChangesAsync();
 
+					var result = _mapper.Map<EmployeeFamilyResponseDto>(newEmployeeFamily);
+
 					return new ApiResponse<EmployeeFamilyResponseDto> {
 						IsSuccess = true,
+						Data =  result,
+						Message = Message.CREATED_SUCCESS
 					};
 				}
 
@@ -145,6 +149,17 @@ namespace QLHSNS.Services {
 			}
 		}
 
+		public async Task<bool> RemoveEmployeeFamilyDetail(Guid id) {
+			var dataFromDb = await _dbContext.EmployeeFamilyDetails.FirstOrDefaultAsync(x => x.Id == id);
+
+			if (dataFromDb == null) { return false; }
+
+			_dbContext.EmployeeFamilyDetails.Remove(dataFromDb);
+			await _dbContext.SaveChangesAsync();
+
+			return true;
+		}
+
 		public async Task<ApiResponse<EmployeeFamilyResponseDto>> UpdateAsync(UpdateEmployeeFamilyRequestDto request) {
 			try {
 				if (request != null) {
@@ -184,6 +199,50 @@ namespace QLHSNS.Services {
 				};
 			} catch (Exception ex) {
 				return new ApiResponse<EmployeeFamilyResponseDto> {
+					IsSuccess = false,
+					Message = ex.Message
+				};
+			}
+		}
+
+		public async Task<ApiResponse<EmployeeFamilyDetailResponseDto>> UpdateEmployeeFamilyDetail(UpdateEmployeeFamilyDetailRequestDto request) {
+			try {
+				if (request != null) {
+					var dataFromDb = await _dbContext.EmployeeFamilyDetails.FirstOrDefaultAsync(x => x.Id == request.Id);
+
+					if(dataFromDb == null) {
+						return new ApiResponse<EmployeeFamilyDetailResponseDto> {
+							IsSuccess = false,
+							Message = Message.DATA_NOT_FOUND
+						};
+					}
+
+					dataFromDb.Name = request.Name;
+					dataFromDb.DateOfBirth = request.DateOfBirth;
+					dataFromDb.PhoneNumber = request.PhoneNumber;
+					dataFromDb.Relationship = request.Relationship;
+					dataFromDb.Occupation = request.Occupation;
+					dataFromDb.EmployeeFamilyId = request.EmployeeFamilyId;
+
+					await _dbContext.SaveChangesAsync();
+
+					var query = await _dbContext.EmployeeFamilyDetails.FirstOrDefaultAsync(x => x.Id ==  dataFromDb.Id);
+
+					var result = _mapper.Map<EmployeeFamilyDetailResponseDto>(query);
+
+					return new ApiResponse<EmployeeFamilyDetailResponseDto> {
+						IsSuccess = true,
+						Data = result,
+						Message = Message.UPDATED_SUCCESS
+					};
+				}
+
+				return new ApiResponse<EmployeeFamilyDetailResponseDto> {
+					IsSuccess = false,
+					Message = Message.INVALID_PAYLOAD
+				};
+			} catch (Exception ex) {
+				return new ApiResponse<EmployeeFamilyDetailResponseDto> {
 					IsSuccess = false,
 					Message = ex.Message
 				};

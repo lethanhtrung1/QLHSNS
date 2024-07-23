@@ -56,5 +56,11 @@ namespace QLHSNS.Controllers {
 		public async Task<ApiResponse<EmployeeAssetResponseDto>> GetAssetByEmployeeId(Guid id) {
 			return await _service.GetAssetByEmployeeId(id);
 		}
+
+		[HttpPost("ChangeStatus/{id:Guid}")]
+		public async Task<IActionResult> ChangeStatusEmployee(Guid id) {
+			var result = await _service.ChangeStatus(id);
+			return result ? Ok() : BadRequest();
+		}
 	}
 }

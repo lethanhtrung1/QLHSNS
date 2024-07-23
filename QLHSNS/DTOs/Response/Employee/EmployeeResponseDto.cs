@@ -13,6 +13,7 @@
 		public EmployeeDepartmentDto Department { get; set; }
 		public EmployeeJobTitleDto JobTitle { get; set; }
 		public EmployeeHealthCareDto HealthCare { get; set; }
+		public int IsWorking { get; set; }
 		public DateTime CreatedAt { get; set; }
 		public DateTime UpdatedAt { get; set; }
 	}

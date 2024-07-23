@@ -110,7 +110,10 @@ namespace QLHSNS.MappingConfigurations {
 
 				config.CreateMap<CreateDepartmentJobTitleDto, DepartmentJobTitle>();
 
-				config.CreateMap<CreateEmployeeRequestDto, Employee>();
+				config.CreateMap<CreateEmployeeRequestDto, Employee>()
+					.ForMember(
+						dest => dest.IsWorking,
+						opt => opt.MapFrom(src => 1));
 
 				config.CreateMap<CreateHealthCareRequestDto, HealthCare>()
 					.ForMember(dest => dest.Status, opt => opt.MapFrom(src => 1));

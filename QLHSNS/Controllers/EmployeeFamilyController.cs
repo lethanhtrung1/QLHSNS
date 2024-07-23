@@ -36,8 +36,19 @@ namespace QLHSNS.Controllers {
 		}
 
 		[HttpPost("AddFamilyDetail")]
-		public async Task<ApiResponse<EmployeeFamilyDetailResponseDto>> AddEmployeeFamilyDetatil(AddEmployeeFamilyDetailRequestDto request) {
+		public async Task<ApiResponse<EmployeeFamilyDetailResponseDto>> AddEmployeeFamilyDetail(AddEmployeeFamilyDetailRequestDto request) {
 			return await _service.AddEmployeeFamilyDetail(request);
+		}
+
+		[HttpPut("UpdateFamilyDetail")]
+		public async Task<ApiResponse<EmployeeFamilyDetailResponseDto>> UpdateFamilyDetail(UpdateEmployeeFamilyDetailRequestDto request) {
+			return await _service.UpdateEmployeeFamilyDetail(request);
+		}
+
+		[HttpDelete("RemoveFamilyDetail")]
+		public async Task<IActionResult> RemoveEmployeeFamilyDetail(Guid id) {
+			var result = await _service.RemoveEmployeeFamilyDetail(id);
+			return result ? Ok() : BadRequest();
 		}
 	}
 }

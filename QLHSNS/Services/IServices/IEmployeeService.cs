@@ -14,5 +14,6 @@ namespace QLHSNS.Services.IServices {
 		Task<bool> DeleteEmployeeAsync(Guid id);
 		Task<ApiResponse<PagedResult<EmployeeResponseDto>>> SearchAllEmployeeAsync(EmployeePagingRequestDto request);
 		Task<ApiResponse<EmployeeAssetResponseDto>> GetAssetByEmployeeId(Guid id);
+		Task<bool> ChangeStatus(Guid employeeId);
 	}
 }

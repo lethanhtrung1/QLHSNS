@@ -16,6 +16,7 @@ namespace QLHSNS.Model {
 		public string BankNumber { get; set; }
 		public Guid? BankBranchId { get; set; }
 		public Guid? HealthCareId { get; set; }
+		public int IsWorking { get; set; }
 		public DateTime CreatedAt { get; set; }
 		public DateTime UpdatedAt { get; set; }
 		public Department Department { get; set; }
