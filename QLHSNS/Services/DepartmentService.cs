@@ -32,7 +32,7 @@ namespace QLHSNS.Services {
 						}
 						await _dbContext.SaveChangesAsync();
 
-						var query = _dbContext.DepartmentJobTitles.Where(x => x.Id == request.DepartmentId);
+						var query = _dbContext.DepartmentJobTitles.Where(x => x.DepartmentId == request.DepartmentId);
 						var jobTitles = _dbContext.JobTitles.Where(x => x.Status == 1);
 						var result = await (from q in query
 											join j in jobTitles on q.JobTitleId equals j.Id into temp
@@ -233,7 +233,7 @@ namespace QLHSNS.Services {
 
 		public async Task<ApiResponse<DepartmentResponseDto>> GetByIdAsync(Guid id) {
 			try {
-				var data = _dbContext.Departments.Where(x => x.Id == id && x.Status == 1);
+				var data = await _dbContext.Departments.Where(x => x.Id == id && x.Status == 1).FirstOrDefaultAsync();
 
 				if (data == null) {
 					return new ApiResponse<DepartmentResponseDto>() {
@@ -242,18 +242,16 @@ namespace QLHSNS.Services {
 					};
 				}
 
-				var departmentJobTitles = _dbContext.DepartmentJobTitles.Where(x => x.DepartmentId == id);
-				var jobTitles = _dbContext.JobTitles.Where(x => x.Status == 1);
-				var departmentJobTitlesQuery = await (from d in departmentJobTitles
-													  join j in jobTitles on d.JobTitleId equals j.Id into temp
-													  from t in temp.DefaultIfEmpty()
-													  select new DepartmentJobTitleResponseDto {
-														  Id = t.Id,
-														  Name = t.JobTitleName,
-													  }).ToListAsync();
+				var departmentJobTitles = await _dbContext.DepartmentJobTitles.Include(x => x.JobTitle)
+												.Where(x => x.DepartmentId == id && x.JobTitle.Status == 1)
+												.Select(x => new DepartmentJobTitleResponseDto {
+													Id = x.Id,
+													Name = x.JobTitle.JobTitleName,
+												})
+												.ToListAsync();
 
-				var result = _mapper.Map<DepartmentResponseDto>(data.FirstOrDefault());
-				result.JobTitles = departmentJobTitlesQuery;
+				var result = _mapper.Map<DepartmentResponseDto>(data);
+				result.JobTitles = departmentJobTitles;
 
 				return new ApiResponse<DepartmentResponseDto>() {
 					Data = result,
@@ -287,18 +285,16 @@ namespace QLHSNS.Services {
 					var result = new List<DepartmentResponseDto>();
 
 					foreach (var item in data) {
-						var departmentJobTitles = _dbContext.DepartmentJobTitles.Where(x => x.DepartmentId == item.Id);
-						var jobTitles = _dbContext.JobTitles.Where(x => x.Status == 1);
-						var query = await (from d in departmentJobTitles
-										   join j in jobTitles on d.JobTitleId equals j.Id into temp
-										   from t in temp.DefaultIfEmpty()
-										   select new DepartmentJobTitleResponseDto {
-											   Id = t.Id,
-											   Name = t.JobTitleName,
-										   }).ToListAsync();
+						var departmentJobTitles = await _dbContext.DepartmentJobTitles.Include(x => x.JobTitle)
+												.Where(x => x.DepartmentId == item.Id && x.JobTitle.Status == 1)
+												.Select(x => new DepartmentJobTitleResponseDto {
+													Id = x.Id,
+													Name = x.JobTitle.JobTitleName,
+												})
+												.ToListAsync();
 
 						var departmentDto = _mapper.Map<DepartmentResponseDto>(item);
-						departmentDto.JobTitles = query;
+						departmentDto.JobTitles = departmentJobTitles;
 						result.Add(departmentDto);
 					}
 
