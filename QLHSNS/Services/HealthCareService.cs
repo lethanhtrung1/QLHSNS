@@ -127,11 +127,16 @@ namespace QLHSNS.Services {
 			}
 		}
 
-		public async Task<ApiResponse<List<HealthCare>>> GetAllHealthCaresAsync() {
+		public async Task<ApiResponse<List<HealthCare>>> GetAllHealthCaresAsync(int status) {
 			try {
-				var data = await _dbContext.HealthCares.Where(x => x.Status == 1).ToListAsync();
+				var data = new List<HealthCare>();
 
-				if(data == null || data.Count == 0) {
+				if (status == -1)
+					data = await _dbContext.HealthCares.ToListAsync();
+				else
+					data = await _dbContext.HealthCares.Where(x => x.Status == status).ToListAsync();
+
+				if (data == null || data.Count == 0) {
 					return new ApiResponse<List<HealthCare>> {
 						IsSuccess = false,
 						Message = Message.DATA_NOT_FOUND

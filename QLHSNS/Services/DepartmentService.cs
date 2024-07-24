@@ -243,7 +243,7 @@ namespace QLHSNS.Services {
 				var departmentJobTitles = await _dbContext.DepartmentJobTitles.Include(x => x.JobTitle)
 												.Where(x => x.DepartmentId == id && x.JobTitle.Status == 1)
 												.Select(x => new DepartmentJobTitleResponseDto {
-													Id = x.Id,
+													Id = x.JobTitleId,
 													Name = x.JobTitle.JobTitleName,
 												})
 												.ToListAsync();
@@ -286,7 +286,7 @@ namespace QLHSNS.Services {
 						var departmentJobTitles = await _dbContext.DepartmentJobTitles.Include(x => x.JobTitle)
 												.Where(x => x.DepartmentId == item.Id && x.JobTitle.Status == 1)
 												.Select(x => new DepartmentJobTitleResponseDto {
-													Id = x.Id,
+													Id = x.JobTitleId,
 													Name = x.JobTitle.JobTitleName,
 												})
 												.ToListAsync();

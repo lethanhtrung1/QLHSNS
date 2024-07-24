@@ -12,6 +12,6 @@ namespace QLHSNS.Services.IServices {
 		Task<bool> DeleteHealthCareAsync(Guid id);
 		Task<ApiResponse<HealthCare>> EnableHealthCareAsync(Guid id);
 		Task<ApiResponse<HealthCare>> DisableHealthCareAsync(Guid id);
-		Task<ApiResponse<List<HealthCare>>> GetAllHealthCaresAsync();
+		Task<ApiResponse<List<HealthCare>>> GetAllHealthCaresAsync(int status);
 	}
 }

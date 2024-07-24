@@ -206,7 +206,7 @@ namespace QLHSNS.Services {
 
 		public async Task<ApiResponse<List<JobTitleResponseDto>>> GetByDepartmentIdAsync(Guid departmentId) {
 			try {
-				var data = await (from d in _dbContext.DepartmentJobTitles.Where(x => x.Id == departmentId)
+				var data = await (from d in _dbContext.DepartmentJobTitles.Where(x => x.DepartmentId == departmentId)
 								  join j in _dbContext.JobTitles.Where(x => x.Status == 1) on d.JobTitleId equals j.Id
 								  select new JobTitleResponseDto {
 									  Id = j.Id,

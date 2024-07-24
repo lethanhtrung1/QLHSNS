@@ -20,6 +20,11 @@ namespace QLHSNS.Controllers {
 			return await _service.GetHealthCareByIdAsync(id);
 		}
 
+		[HttpGet("GetAll/{status:int}")]
+		public async Task<ApiResponse<List<HealthCare>>> GetAllHealthCare(int status) {
+			return await _service.GetAllHealthCaresAsync(status);
+		}
+
 		[HttpPost("GetList")]
 		public async Task<ApiResponse<PagedResult<HealthCare>>> GetList(PagingRequestBase request) {
 			return await _service.GetHealthCaresAsync(request);
