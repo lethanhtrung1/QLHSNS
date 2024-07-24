@@ -20,13 +20,13 @@ namespace QLHSNS.Controllers {
 		}
 
 		[HttpGet("GetByBankId/{id:Guid}")]
-		public async Task<ApiResponse<List<BankBranchDto>>> GetByBankId(Guid id) {
-			return await _service.GetByBankIdAsync(id);
+		public async Task<ApiResponse<List<BankBranchDto>>> GetByBankId(Guid id, [FromQuery] int status) {
+			return await _service.GetByBankIdAsync(id, status);
 		}
 
-		[HttpGet("GetAll")]
-		public async Task<ApiResponse<List<BankBranchDto>>> GetAll() {
-			return await _service.GetAllAsync();
+		[HttpGet("GetAll/{status:int}")]
+		public async Task<ApiResponse<List<BankBranchDto>>> GetAll(int status) {
+			return await _service.GetAllAsync(status);
 		}
 
 		[HttpPost("GetList")]

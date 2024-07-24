@@ -61,9 +61,9 @@ namespace QLHSNS.Controllers {
 			return await _service.UpdateDepartmentJobTitleAsync(request);
 		}
 
-		[HttpGet("GetAllDepartment")]
-		public async Task<ApiResponse<List<DepartmentBaseResponseDto>>> GetAll() {
-			return await _service.GetAllAsync();
+		[HttpGet("GetAllDepartment/{status:int}")]
+		public async Task<ApiResponse<List<DepartmentBaseResponseDto>>> GetAll(int status) {
+			return await _service.GetAllAsync(status);
 		}
 	}
 }

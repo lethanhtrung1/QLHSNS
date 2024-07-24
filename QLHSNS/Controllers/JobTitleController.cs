@@ -24,9 +24,14 @@ namespace QLHSNS.Controllers {
 			return await _jobTitleService.GetByDepartmentIdAsync(id);
 		}
 
+		[HttpGet("GetAll/{status:int}")]
+		public async Task<ApiResponse<List<JobTitleResponseDto>>> GetAllJobTitle(int status) {
+			return await _jobTitleService.GetAllJobTitle(status);
+		}
+
 		[HttpPost("GetAll")]
 		public async Task<ApiResponse<PagedResult<JobTitleResponseDto>>> GetAll(PagingRequestBase request) {
-			return await _jobTitleService.GetAllAsync(request);
+			return await _jobTitleService.GetAllPagingAsync(request);
 		}
 
 		[HttpPost("Create")]

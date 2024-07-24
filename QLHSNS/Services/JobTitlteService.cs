@@ -136,12 +136,12 @@ namespace QLHSNS.Services {
 			}
 		}
 
-		public async Task<ApiResponse<PagedResult<JobTitleResponseDto>>> GetAllAsync(PagingRequestBase request) {
+		public async Task<ApiResponse<PagedResult<JobTitleResponseDto>>> GetAllPagingAsync(PagingRequestBase request) {
 			try {
-				var data = await _dbContext.JobTitles.Where(x=>x.Status == 1)
+				var data = await _dbContext.JobTitles
 							.Skip((request.PageNumber - 1) * request.PageSize)
 							.Take(request.PageSize).ToListAsync();
-				
+
 				if (data.Count == 0) {
 					return new ApiResponse<PagedResult<JobTitleResponseDto>> {
 						IsSuccess = false,
@@ -149,7 +149,7 @@ namespace QLHSNS.Services {
 					};
 				}
 
-				int totalRecord = await _dbContext.JobTitles.Where(x => x.Status == 1).CountAsync();
+				int totalRecord = await _dbContext.JobTitles.CountAsync();
 				var result = _mapper.Map<List<JobTitleResponseDto>>(data);
 
 				return new ApiResponse<PagedResult<JobTitleResponseDto>> {
@@ -160,6 +160,46 @@ namespace QLHSNS.Services {
 				return new ApiResponse<PagedResult<JobTitleResponseDto>> {
 					IsSuccess = false,
 					Message = ex.Message,
+				};
+			}
+		}
+
+		public async Task<ApiResponse<List<JobTitleResponseDto>>> GetAllJobTitle(int status) {
+			try {
+				var data = new List<JobTitleResponseDto>();
+				if (status == -1)
+					data = await _dbContext.JobTitles.Select(x => new JobTitleResponseDto {
+						Id = x.Id,
+						JobTitleName = x.JobTitleName,
+						Status = x.Status,
+						CreatedAt = x.CreatedAt,
+						UpdatedAt = x.UpdatedAt,
+					}).ToListAsync();
+				else
+					data = await _dbContext.JobTitles.Where(x => x.Status == status)
+								 .Select(x => new JobTitleResponseDto {
+									 Id = x.Id,
+									 JobTitleName = x.JobTitleName,
+									 Status = x.Status,
+									 CreatedAt = x.CreatedAt,
+									 UpdatedAt = x.UpdatedAt,
+								 }).ToListAsync();
+
+				if (data == null || data.Count == 0) {
+					return new ApiResponse<List<JobTitleResponseDto>> {
+						IsSuccess = false,
+						Message = "Not found"
+					};
+				}
+
+				return new ApiResponse<List<JobTitleResponseDto>> {
+					IsSuccess = true,
+					Data = data,
+				};
+			} catch (Exception ex) {
+				return new ApiResponse<List<JobTitleResponseDto>> {
+					IsSuccess = false,
+					Message = ex.Message
 				};
 			}
 		}
@@ -176,7 +216,7 @@ namespace QLHSNS.Services {
 									  UpdatedAt = j.UpdatedAt,
 								  }).ToListAsync();
 
-				if(data == null || data.Count == 0) {
+				if (data == null || data.Count == 0) {
 					return new ApiResponse<List<JobTitleResponseDto>> {
 						IsSuccess = false,
 						Message = "Not found"
@@ -232,7 +272,6 @@ namespace QLHSNS.Services {
 					}
 
 					dataFromDb.JobTitleName = jobTitle.JobTitleName;
-					dataFromDb.Status = jobTitle.Status;
 					dataFromDb.UpdatedAt = DateTime.Now;
 
 					await _dbContext.SaveChangesAsync();

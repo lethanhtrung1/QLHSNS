@@ -4,6 +4,7 @@ using QLHSNS.Data;
 using QLHSNS.DTOs.Pagination;
 using QLHSNS.DTOs.Response;
 using QLHSNS.DTOs.Response.BankBranch;
+using QLHSNS.Model;
 using QLHSNS.Services.IServices;
 
 namespace QLHSNS.Services {
@@ -76,9 +77,14 @@ namespace QLHSNS.Services {
 			}
 		}
 
-		public async Task<ApiResponse<List<BankBranchDto>>> GetAllAsync() {
+		public async Task<ApiResponse<List<BankBranchDto>>> GetAllAsync(int status) {
 			try {
-				var data = await _dbContext.BankBranches.Where(x => x.Status == 1).ToListAsync();
+				var data = new List<BankBranch>();
+				if (status == 0 || status == 1)
+					data = await _dbContext.BankBranches.Include(x => x.Bank)
+						.Where(x => x.Status == 1 && x.Bank.Status == 1).ToListAsync();
+				else
+					data = await _dbContext.BankBranches.Include(x => x.Bank).Where(x => x.Bank.Status == 1).ToListAsync();
 
 				if (data == null || data.Count == 0) {
 					return new ApiResponse<List<BankBranchDto>> {
@@ -142,7 +148,7 @@ namespace QLHSNS.Services {
 						};
 					}
 
-					int totalRecord = await _dbContext.Locations.CountAsync();
+					int totalRecord = await _dbContext.BankBranches.CountAsync();
 					var result = _mapper.Map<List<BankBranchResponseDto>>(data);
 
 					return new ApiResponse<PagedResult<BankBranchResponseDto>>() {
@@ -162,9 +168,20 @@ namespace QLHSNS.Services {
 			}
 		}
 
-		public async Task<ApiResponse<List<BankBranchDto>>> GetByBankIdAsync(Guid BankId) {
+		public async Task<ApiResponse<List<BankBranchDto>>> GetByBankIdAsync(Guid BankId, int status) {
 			try {
-				var data = await _dbContext.BankBranches.Where(x => x.BankId == BankId && x.Status == 1).ToListAsync();
+				var checkBank = await _dbContext.Banks.Where(x => x.Id == BankId && x.Status == status).FirstOrDefaultAsync();
+				if (checkBank == null) {
+					return new ApiResponse<List<BankBranchDto>> {
+						IsSuccess = false,
+						Message = "Bank is not active"
+					};
+				}
+				var data = new List<BankBranch>();
+				if (status == 0 || status == 1)
+					data = await _dbContext.BankBranches.Where(x => x.BankId == BankId && x.Status == status).Include(x => x.Bank).ToListAsync();
+				else
+					data = await _dbContext.BankBranches.Where(x => x.BankId == BankId).Include(x => x.Bank).ToListAsync();
 
 				if (data == null || data.Count == 0) {
 					return new ApiResponse<List<BankBranchDto>> {

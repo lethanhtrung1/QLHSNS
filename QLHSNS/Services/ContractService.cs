@@ -577,7 +577,7 @@ namespace QLHSNS.Services {
 		public async Task<ApiResponse<PagedResult<ContractResponseDto>>> FilterAsync(FilterContractRequestDto request) {
 			try {
 				if (request != null) {
-					var query = await _dbContext.Contracts.Include(x => x.ContractType).Where(x => x.IsDeleted == 0).ToListAsync();
+					var query = await _dbContext.Contracts.Include(x => x.ContractType).Where(x => x.IsDeleted == request.IsDeleted).ToListAsync();
 
 					if (request.ContractTypeId.HasValue) {
 						query = query.Where(x => x.ContractTypeId == request.ContractTypeId).ToList();

@@ -4,6 +4,7 @@ using QLHSNS.Data;
 using QLHSNS.DTOs.Pagination;
 using QLHSNS.DTOs.Response;
 using QLHSNS.DTOs.Response.Bank;
+using QLHSNS.Model;
 using QLHSNS.Services.IServices;
 
 namespace QLHSNS.Services {
@@ -91,6 +92,35 @@ namespace QLHSNS.Services {
 		public async Task<ApiResponse<List<BankResponseDto>>> GetAllAsync() {
 			try {
 				var data = await _dbContext.Banks.Where(x => x.Status == 1).ToListAsync();
+
+				if (data == null || data.Count == 0) {
+					return new ApiResponse<List<BankResponseDto>>() {
+						IsSuccess = false,
+						Message = "Not found"
+					};
+				}
+
+				var result = _mapper.Map<List<BankResponseDto>>(data);
+
+				return new ApiResponse<List<BankResponseDto>>() {
+					IsSuccess = true,
+					Data = result,
+				};
+			} catch (Exception ex) {
+				return new ApiResponse<List<BankResponseDto>>() {
+					IsSuccess = false,
+					Message = ex.Message
+				};
+			}
+		}
+
+		public async Task<ApiResponse<List<BankResponseDto>>> FilterBank(int status) {
+			try {
+				var data = new List<Bank>();
+				if (status == 0 || status == 1)
+					data = await _dbContext.Banks.Where(x => x.Status == status).ToListAsync();
+				else
+					data = await _dbContext.Banks.ToListAsync();
 
 				if (data == null || data.Count == 0) {
 					return new ApiResponse<List<BankResponseDto>>() {

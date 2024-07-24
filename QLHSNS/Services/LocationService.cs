@@ -63,7 +63,7 @@ namespace QLHSNS.Services {
 		}
 
 		public async Task<ApiResponse<List<Location>>> GetAllLocationsAsync(LocationRequestDto request) {
-			try {
+			try		{
 				if(request != null) {
 					var query = new List<Location>();
 					query = await _dbContext.Locations.ToListAsync();
@@ -75,16 +75,16 @@ namespace QLHSNS.Services {
 											|| x.Ward.Trim().ToLower().Contains(request.Keyword.Trim().ToLower())).ToList();
 					}
 
-					if(request.Country != null) {
+					if(!string.IsNullOrWhiteSpace(request.Country!.Trim())) {
 						query = query.Where(x => x.Country.ToLower() ==  request.Country.ToLower()).ToList();
 					}
-					if (request.Province != null) {
+					if (!string.IsNullOrWhiteSpace(request.Province!.Trim())) {
 						query = query.Where(x => x.Province.ToLower() == request.Province.ToLower()).ToList();
 					}
-					if (request.District != null) {
+					if (!string.IsNullOrWhiteSpace(request.District!.Trim())) {
 						query = query.Where(x => x.District.ToLower() == request.District.ToLower()).ToList();
 					}
-					if (request.Ward != null) {
+					if (!string.IsNullOrWhiteSpace(request.Ward!.Trim())) {
 						query = query.Where(x => x.Ward.ToLower() == request.Ward.ToLower()).ToList();
 					}
 

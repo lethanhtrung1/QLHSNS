@@ -129,7 +129,7 @@ namespace QLHSNS.Services {
 
 		public async Task<ApiResponse<PagedResult<ContractType>>> GetPagingAsync(PagingRequestBase request) {
 			try {
-				var data = await _dbContext.ContractTypes.Where(x => x.Status == 1)
+				var data = await _dbContext.ContractTypes
 									.Skip((request.PageNumber - 1) * request.PageSize)
 									.Take(request.PageSize).ToListAsync();
 
@@ -140,7 +140,7 @@ namespace QLHSNS.Services {
 					};
 				}
 
-				int totalRecord = await _dbContext.ContractTypes.Where(x => x.Status == 1).CountAsync();
+				int totalRecord = await _dbContext.ContractTypes.CountAsync();
 
 				return new ApiResponse<PagedResult<ContractType>>() {
 					Data = new PagedResult<ContractType>(data, totalRecord, request.PageNumber, request.PageSize),
@@ -156,7 +156,7 @@ namespace QLHSNS.Services {
 
 		public async Task<ApiResponse<ContractType>> GetByIdAsync(Guid id) {
 			try {
-				var data = await _dbContext.ContractTypes.Where(x => x.Id == id && x.Status == 1).FirstOrDefaultAsync();
+				var data = await _dbContext.ContractTypes.Where(x => x.Id == id).FirstOrDefaultAsync();
 
 				if (data == null) {
 					return new ApiResponse<ContractType>() {
@@ -188,7 +188,6 @@ namespace QLHSNS.Services {
 						};
 					}
 					dataFromDb.ContractTypeName = request.ContractTypeName;
-					dataFromDb.Status = request.Status;
 					dataFromDb.UpdatedAt = DateTime.Now;
 
 					await _dbContext.SaveChangesAsync();
@@ -214,8 +213,13 @@ namespace QLHSNS.Services {
 			}
 		}
 
-		public async Task<ApiResponse<List<ContractType>>> GetAllAsync() {
-			var data = await _dbContext.ContractTypes.Where(x => x.Status == 1).ToListAsync();
+		public async Task<ApiResponse<List<ContractType>>> GetAllAsync(int status) {
+			var data = new List<ContractType>();
+
+			if(status == -1)
+				data = await _dbContext.ContractTypes.ToListAsync();
+			else
+				data = await _dbContext.ContractTypes.Where(x => x.Status == status).ToListAsync();
 
 			if (data == null || data.Count == 0) {
 				return new ApiResponse<List<ContractType>> {

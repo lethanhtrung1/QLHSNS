@@ -148,7 +148,7 @@ namespace QLHSNS.Services {
 		public async Task<ApiResponse<PagedResult<AssetResponseDto>>> GetAssetsAsync(PagingRequestBase request) {
 			try {
 				if (request != null) {
-					var dataList = await _dbContext.Assets.Where(x => x.Status == 1)
+					var dataList = await _dbContext.Assets
 										.Skip((request.PageNumber - 1) * request.PageSize)
 										.Take(request.PageSize).ToListAsync();
 
@@ -180,9 +180,14 @@ namespace QLHSNS.Services {
 			}
 		}
 
-		public async Task<ApiResponse<List<AssetResponseDto>>> GetAllAssetsAsync() {
+		public async Task<ApiResponse<List<AssetResponseDto>>> GetAllAssetsAsync(int status) {
 			try {
-				var data = await _dbContext.Assets.Where(x => x.Status == 1).ToListAsync();
+				var data = new List<Asset>();
+
+				if(status == -1)
+					data = await _dbContext.Assets.ToListAsync();
+				else
+					data = await _dbContext.Assets.Where(x => x.Status == status).ToListAsync();
 
 				if (data == null || data.Count == 0) {
 					return new ApiResponse<List<AssetResponseDto>> {

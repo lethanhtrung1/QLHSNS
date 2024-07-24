@@ -14,6 +14,6 @@ namespace QLHSNS.Services.IServices {
 		Task<ApiResponse<DepartmentResponseDto>> DisableDepartmentAsync(Guid id);
 		Task<ApiResponse<List<DepartmentJobTitleResponseDto>>> AddDepartmentJobTitleAsync(DepartmentJobTitleRequestDto request);
 		Task<ApiResponse<List<DepartmentJobTitleResponseDto>>> UpdateDepartmentJobTitleAsync(DepartmentJobTitleRequestDto request);
-		Task<ApiResponse<List<DepartmentBaseResponseDto>>> GetAllAsync();
+		Task<ApiResponse<List<DepartmentBaseResponseDto>>> GetAllAsync(int status);
 	}
 }

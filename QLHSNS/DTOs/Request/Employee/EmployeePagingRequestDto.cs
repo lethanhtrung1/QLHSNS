@@ -13,6 +13,7 @@ namespace QLHSNS.DTOs.Request.Employee {
 		public string? PhoneNumber { get; set; }
 		public string? Email { get; set; }
 		public string? BankNumber { get; set; }
+		public int IsWorking { get; set; }
 
 		public string? SortField { get; set; }
 		public int SortOrder { get; set; }

@@ -12,6 +12,6 @@ namespace QLHSNS.Services.IServices {
 		Task<bool> DeleteAsync(Guid id);
 		Task<ApiResponse<ContractType>> EnableAsync(Guid id);
 		Task<ApiResponse<ContractType>> DisableAsync(Guid id);
-		Task<ApiResponse<List<ContractType>>> GetAllAsync();
+		Task<ApiResponse<List<ContractType>>> GetAllAsync(int status);
 	}
 }

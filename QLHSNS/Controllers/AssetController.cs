@@ -51,9 +51,9 @@ namespace QLHSNS.Controllers {
 			return await _service.DisableAssetAsync(id);
 		}
 
-		[HttpGet("GetAll")]
-		public async Task<ApiResponse<List<AssetResponseDto>>> GetAll() {
-			return await _service.GetAllAssetsAsync();
+		[HttpGet("GetAll/{status:int}")]
+		public async Task<ApiResponse<List<AssetResponseDto>>> GetAll(int status) {
+			return await _service.GetAllAssetsAsync(status);
 		}
 	}
 }

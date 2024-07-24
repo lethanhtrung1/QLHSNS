@@ -12,6 +12,6 @@ namespace QLHSNS.Services.IServices {
 		Task<ApiResponse<AssetResponseDto>> UpdateAssetAsync(UpdateAssetRequestDto request);
 		Task<ApiResponse<AssetResponseDto>> EnableAssetAsync(Guid id);
 		Task<ApiResponse<AssetResponseDto>> DisableAssetAsync(Guid id);
-		Task<ApiResponse<List<AssetResponseDto>>> GetAllAssetsAsync();
+		Task<ApiResponse<List<AssetResponseDto>>> GetAllAssetsAsync(int status);
 	}
 }

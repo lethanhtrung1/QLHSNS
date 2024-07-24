@@ -6,12 +6,13 @@ using QLHSNS.DTOs.Response.JobTitle;
 namespace QLHSNS.Services.IServices {
 	public interface IJobTitleService {
 		Task<ApiResponse<JobTitleResponseDto>> GetByIdAsync(Guid id);
-		Task<ApiResponse<PagedResult<JobTitleResponseDto>>> GetAllAsync(PagingRequestBase request);
+		Task<ApiResponse<PagedResult<JobTitleResponseDto>>> GetAllPagingAsync(PagingRequestBase request);
 		Task<ApiResponse<JobTitleResponseDto>> CreateAsync(CreateJobTitleRequestDto jobTitle);
 		Task<ApiResponse<JobTitleResponseDto>> UpdateAsync(UpdateJobTitleRequestDto jobTitle);
 		Task<bool> DeleteAsync(Guid id);
 		Task<ApiResponse<JobTitleResponseDto>> EnableAsync(Guid id);
 		Task<ApiResponse<JobTitleResponseDto>> DisableAsync(Guid id);
 		Task<ApiResponse<List<JobTitleResponseDto>>> GetByDepartmentIdAsync(Guid departmentId);
+		Task<ApiResponse<List<JobTitleResponseDto>>> GetAllJobTitle(int status);
 	}
 }

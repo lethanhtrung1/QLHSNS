@@ -32,15 +32,13 @@ namespace QLHSNS.Services {
 						}
 						await _dbContext.SaveChangesAsync();
 
-						var query = _dbContext.DepartmentJobTitles.Where(x => x.DepartmentId == request.DepartmentId);
-						var jobTitles = _dbContext.JobTitles.Where(x => x.Status == 1);
-						var result = await (from q in query
-											join j in jobTitles on q.JobTitleId equals j.Id into temp
-											from t in temp.DefaultIfEmpty()
-											select new DepartmentJobTitleResponseDto {
-												Id = t.Id,
-												Name = t.JobTitleName
-											}).ToListAsync();
+						var result = await _dbContext.DepartmentJobTitles.Include(x => x.JobTitle)
+												.Where(x => x.DepartmentId == request.DepartmentId && x.JobTitle.Status == 1)
+												.Select(x => new DepartmentJobTitleResponseDto {
+													Id = x.Id,
+													Name = x.JobTitle.JobTitleName,
+												})
+												.ToListAsync();
 
 						return new ApiResponse<List<DepartmentJobTitleResponseDto>> {
 							Data = result,
@@ -90,21 +88,17 @@ namespace QLHSNS.Services {
 
 					await _dbContext.SaveChangesAsync();
 
-					var departments = _dbContext.Departments.Where(x => x.Id == newDepartment.Id);
-					var jobTitles = _dbContext.JobTitles.Where(x => x.Status == 1);
-					//var result = _mapper.Map<DepartmentResponseDto>(query.FirstOrDefaultAsync());
+					var departments = await _dbContext.Departments.Where(x => x.Id == newDepartment.Id && x.Status == 1).FirstOrDefaultAsync();
+					var departmentJobTitles = await _dbContext.DepartmentJobTitles.Include(x => x.JobTitle)
+												.Where(x => x.DepartmentId == newDepartment.Id && x.JobTitle.Status == 1)
+												.Select(x => new DepartmentJobTitleResponseDto {
+													Id = x.Id,
+													Name = x.JobTitle.JobTitleName,
+												})
+												.ToListAsync();
 
-					var departmentJobTitlesQuery = await (from q in departments
-														  join d in _dbContext.DepartmentJobTitles on q.Id equals d.DepartmentId
-														  join j in jobTitles on d.JobTitleId equals j.Id into temp
-														  from t in temp.DefaultIfEmpty()
-														  select new DepartmentJobTitleResponseDto {
-															  Id = t.Id,
-															  Name = t.JobTitleName,
-														  }).ToListAsync();
-
-					var result = _mapper.Map<DepartmentResponseDto>(departments.FirstOrDefault());
-					result.JobTitles = departmentJobTitlesQuery;
+					var result = _mapper.Map<DepartmentResponseDto>(departments);
+					result.JobTitles = departmentJobTitles;
 
 					return new ApiResponse<DepartmentResponseDto>() {
 						Data = result,
@@ -206,9 +200,13 @@ namespace QLHSNS.Services {
 			}
 		}
 
-		public async Task<ApiResponse<List<DepartmentBaseResponseDto>>> GetAllAsync() {
+		public async Task<ApiResponse<List<DepartmentBaseResponseDto>>> GetAllAsync(int status) {
 			try {
-				var data = await _dbContext.Departments.Where(x => x.Status == 1).ToListAsync();
+				var data = new List<Department>();
+				if(status == 0 || status == 1)
+					data = await _dbContext.Departments.Where(x => x.Status == status).ToListAsync();
+				else
+					data = await _dbContext.Departments.ToListAsync();
 
 				if (data == null || data.Count == 0) {
 					return new ApiResponse<List<DepartmentBaseResponseDto>> {
@@ -233,7 +231,7 @@ namespace QLHSNS.Services {
 
 		public async Task<ApiResponse<DepartmentResponseDto>> GetByIdAsync(Guid id) {
 			try {
-				var data = await _dbContext.Departments.Where(x => x.Id == id && x.Status == 1).FirstOrDefaultAsync();
+				var data = await _dbContext.Departments.Where(x => x.Id == id).FirstOrDefaultAsync();
 
 				if (data == null) {
 					return new ApiResponse<DepartmentResponseDto>() {
@@ -268,7 +266,7 @@ namespace QLHSNS.Services {
 		public async Task<ApiResponse<PagedResult<DepartmentResponseDto>>> GetDepartmentsAsync(PagingRequestBase request) {
 			try {
 				if (request != null) {
-					var data = await _dbContext.Departments.Where(x => x.Status == 1)
+					var data = await _dbContext.Departments
 									.Skip((request.PageNumber - 1) * request.PageSize)
 									.Take(request.PageSize).ToListAsync();
 
@@ -279,7 +277,7 @@ namespace QLHSNS.Services {
 						};
 					}
 
-					int totalRecord = await _dbContext.Departments.Where(x => x.Status == 1).CountAsync();
+					int totalRecord = await _dbContext.Departments.CountAsync();
 					//var result = _mapper.Map<List<DepartmentResponseDto>>(data);
 
 					var result = new List<DepartmentResponseDto>();
@@ -329,7 +327,6 @@ namespace QLHSNS.Services {
 					}
 
 					departments.Name = request.Name;
-					departments.Status = request.Status;
 					departments.UpdatedAt = DateTime.Now;
 
 					if (request.JobTitleIds != null && request.JobTitleIds.Count > 0) {
@@ -357,18 +354,16 @@ namespace QLHSNS.Services {
 					await _dbContext.SaveChangesAsync();
 
 					var departmentFromDb = await _dbContext.Departments.FirstOrDefaultAsync(x => x.Id == request.Id);
-					var query = _dbContext.DepartmentJobTitles.Where(x => x.Id == request.Id);
-					var jobTitles = _dbContext.JobTitles.Where(x => x.Status == 1);
-					var data = await (from q in query
-									  join j in jobTitles on q.JobTitleId equals j.Id into temp
-									  from t in temp.DefaultIfEmpty()
-									  select new DepartmentJobTitleResponseDto {
-										  Id = t.Id,
-										  Name = t.JobTitleName
-									  }).ToListAsync();
+					var departmentJobTitles = await _dbContext.DepartmentJobTitles.Include(x => x.JobTitle)
+												.Where(x => x.DepartmentId == request.Id && x.JobTitle.Status == 1)
+												.Select(x => new DepartmentJobTitleResponseDto {
+													Id = x.Id,
+													Name = x.JobTitle.JobTitleName,
+												})
+												.ToListAsync();
 
 					var result = _mapper.Map<DepartmentResponseDto>(departmentFromDb);
-					result.JobTitles = data;
+					result.JobTitles = departmentJobTitles;
 
 					return new ApiResponse<DepartmentResponseDto>() {
 						Data = result,

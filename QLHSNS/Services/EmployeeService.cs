@@ -240,7 +240,7 @@ namespace QLHSNS.Services {
 
 		public async Task<ApiResponse<EmployeeResponseDto>> GetEmployeeByIdAsync(Guid id) {
 			try {
-				var employeeFromDb = await _dbContext.Employees.Where(x => x.Id == id && x.IsWorking == 1)
+				var employeeFromDb = await _dbContext.Employees.Where(x => x.Id == id)
 							//.Include(x => x.BankBranch).ThenInclude(x => x.Bank)
 							//.Include(x => x.Department).Include(x => x.JobTitle)
 							//.Include(x => x.HealthCare).Include(x => x.Location)
@@ -319,7 +319,7 @@ namespace QLHSNS.Services {
 		public async Task<ApiResponse<PagedResult<EmployeeResponseDto>>> GetEmployeesAsync(PagingRequestBase request) {
 			try {
 				if (request != null) {
-					var employees = await _dbContext.Employees.Where(x => x.IsWorking == 1)
+					var employees = await _dbContext.Employees
 						.Skip((request.PageNumber - 1) * request.PageSize)
 						.Take(request.PageSize).ToListAsync();
 
@@ -410,7 +410,7 @@ namespace QLHSNS.Services {
 			try {
 				if (request != null) {
 					var query = new List<Employee>();
-					query = await _dbContext.Employees.Where(x => x.IsWorking == 1)
+					query = await _dbContext.Employees.Where(x => x.IsWorking == request.IsWorking)
 													  .Include(x => x.Department)
 													  .Include(x => x.JobTitle)
 													  .Include(x => x.HealthCare)

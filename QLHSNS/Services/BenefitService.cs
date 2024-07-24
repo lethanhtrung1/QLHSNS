@@ -131,7 +131,7 @@ namespace QLHSNS.Services {
 
 		public async Task<ApiResponse<PagedResult<BenefitResponseDto>>> GetPagingAsync(PagingRequestBase request) {
 			try {
-				var data = await _dbContext.Benefits.Where(x => x.Status == 1)
+				var data = await _dbContext.Benefits
 							.Skip((request.PageNumber - 1) * request.PageSize)
 							.Take(request.PageSize).ToListAsync();
 
@@ -142,7 +142,7 @@ namespace QLHSNS.Services {
 					};
 				}
 
-				int totalRecord = await _dbContext.Benefits.Where(x => x.Status == 1).CountAsync();
+				int totalRecord = await _dbContext.Benefits.CountAsync();
 				var result = _mapper.Map<List<BenefitResponseDto>>(data);
 
 				return new ApiResponse<PagedResult<BenefitResponseDto>>() {
@@ -159,7 +159,7 @@ namespace QLHSNS.Services {
 
 		public async Task<ApiResponse<BenefitResponseDto>> GetByIdAsync(Guid id) {
 			try {
-				var data = await _dbContext.Benefits.Where(x => x.Id == id && x.Status == 1).FirstOrDefaultAsync();
+				var data = await _dbContext.Benefits.Where(x => x.Id == id).FirstOrDefaultAsync();
 				if (data == null) {
 					return new ApiResponse<BenefitResponseDto>() {
 						IsSuccess = false,
@@ -194,7 +194,6 @@ namespace QLHSNS.Services {
 					dataFromDb.BenefitName = request.BenefitName;
 					dataFromDb.Description = request.Description;
 					dataFromDb.Amount = request.Amount;
-					dataFromDb.Status = request.Status;
 					dataFromDb.UpdatedAt = DateTime.Now;
 
 					await _dbContext.SaveChangesAsync();
@@ -221,11 +220,16 @@ namespace QLHSNS.Services {
 			}
 		}
 
-		public async Task<ApiResponse<List<BenefitResponseDto>>> GetAllAsync() {
+		public async Task<ApiResponse<List<BenefitResponseDto>>> GetAllAsync(int status) {
 			try {
-				var data = await _dbContext.Benefits.Where(x => x.Status == 1).ToListAsync();
+				var data = new List<Benefit>();
 
-				if(data == null || data.Count == 0) {
+				if(status == -1)
+					data = await _dbContext.Benefits.ToListAsync();
+				else
+					data = await _dbContext.Benefits.Where(x => x.Status == status).ToListAsync();
+
+				if (data == null || data.Count == 0) {
 					return new ApiResponse<List<BenefitResponseDto>> {
 						IsSuccess = false,
 						Message = "No data"

@@ -138,7 +138,7 @@ namespace QLHSNS.Services {
 
 		public async Task<ApiResponse<PagedResult<AllowanceResponseDto>>> GetPagingAsync(PagingRequestBase request) {
 			try {
-				var data = await _dbContext.Allowances.Where(x => x.Status == 1)
+				var data = await _dbContext.Allowances
 						.Skip((request.PageNumber - 1) * request.PageSize)
 						.Take(request.PageSize).ToListAsync();
 
@@ -149,7 +149,7 @@ namespace QLHSNS.Services {
 					};
 				}
 
-				int totalResord = await _dbContext.Allowances.Where(x => x.Status == 1).CountAsync();
+				int totalResord = await _dbContext.Allowances.CountAsync();
 				var result = _mapper.Map<List<AllowanceResponseDto>>(data);
 
 				return new ApiResponse<PagedResult<AllowanceResponseDto>>() {
@@ -166,7 +166,7 @@ namespace QLHSNS.Services {
 
 		public async Task<ApiResponse<AllowanceResponseDto>> GetByIdAsync(Guid id) {
 			try {
-				var data = await _dbContext.Allowances.Where(x => x.Id == id && x.Status == 1).FirstOrDefaultAsync();
+				var data = await _dbContext.Allowances.Where(x => x.Id == id).FirstOrDefaultAsync();
 
 				if (data == null) {
 					return new ApiResponse<AllowanceResponseDto>() {
@@ -201,7 +201,6 @@ namespace QLHSNS.Services {
 					}
 
 					dataFromDb.AllowanceName = request.AllowanceName;
-					dataFromDb.Status = request.Status;
 					dataFromDb.Value = request.Value;
 					dataFromDb.Unit = request.Unit;
 					dataFromDb.UpdatedAt = DateTime.Now;
@@ -230,11 +229,15 @@ namespace QLHSNS.Services {
 			}
 		}
 
-		public async Task<ApiResponse<List<AllowanceResponseDto>>> GetAllAsync() {
+		public async Task<ApiResponse<List<AllowanceResponseDto>>> GetAllAsync(int status) {
 			try {
-				var data = await _dbContext.Allowances.Where(x => x.Status == 1).ToListAsync();
+				var data = new List<Allowance>();
+				if(status == 0 || status == 1)
+					data = await _dbContext.Allowances.Where(x => x.Status == status).ToListAsync();
+				else if (status == -1)
+					data = await _dbContext.Allowances.ToListAsync();
 
-				if(data == null || data.Count == 0) {
+				if (data == null || data.Count == 0) {
 					return new ApiResponse<List<AllowanceResponseDto>> {
 						IsSuccess = false,
 						Message = "Not data"

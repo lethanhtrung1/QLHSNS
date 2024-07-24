@@ -51,9 +51,9 @@ namespace QLHSNS.Controllers {
 			return await _allowanceService.DisableAsync(id);
 		}
 
-		[HttpGet("GetAll")]
-		public async Task<ApiResponse<List<AllowanceResponseDto>>> GetAll() {
-			return await _allowanceService.GetAllAsync();
+		[HttpGet("GetAll/{status:int}")]
+		public async Task<ApiResponse<List<AllowanceResponseDto>>> GetAll(int status) {
+			return await _allowanceService.GetAllAsync(status);
 		}
 	}
 }

@@ -51,8 +51,18 @@ namespace QLHSNS.MappingConfigurations {
 
 				config.CreateMap<Bank, BankResponseDto>();
 
-				config.CreateMap<BankBranch, BankBranchResponseDto>();
-				config.CreateMap<BankBranch, BankBranchDto>();
+				config.CreateMap<BankBranch, BankBranchResponseDto>()
+					.ForMember(
+						dest => dest.BankId,
+						opt => opt.MapFrom(src => src.Bank.Id))
+					.ForMember(
+						dest => dest.BankName,
+						opt => opt.MapFrom(src => src.Bank.BankName));
+
+				config.CreateMap<BankBranch, BankBranchDto>()
+					.ForMember(
+						dest => dest.BankName,
+						opt => opt.MapFrom(src => src.Bank.BankName));
 
 				config.CreateMap<Asset, AssetResponseDto>()
 					.ForMember(

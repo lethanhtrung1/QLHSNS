@@ -24,6 +24,11 @@ namespace QLHSNS.Controllers {
 			return await _service.GetAllAsync();
 		}
 
+		[HttpGet("Filter/{status:int}")]
+		public async Task<ApiResponse<List<BankResponseDto>>> FilterBank(int status) {
+			return await _service.FilterBank(status);
+		}
+
 		[HttpPost("GetList")]
 		public async Task<ApiResponse<PagedResult<BankResponseDto>>> GetBanks(PagingRequestBase request) {
 			return await _service.GetBanksAsync(request);

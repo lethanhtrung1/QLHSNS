@@ -12,6 +12,6 @@ namespace QLHSNS.Services.IServices {
 		Task<ApiResponse<BenefitResponseDto>> UpdateAsync(UpdateBenefitRequestDto request);
 		Task<ApiResponse<BenefitResponseDto>> EnableAsync(Guid id);
 		Task<ApiResponse<BenefitResponseDto>> DisableAsync(Guid id);
-		Task<ApiResponse<List<BenefitResponseDto>>> GetAllAsync();
+		Task<ApiResponse<List<BenefitResponseDto>>> GetAllAsync(int status);
 	}
 }
