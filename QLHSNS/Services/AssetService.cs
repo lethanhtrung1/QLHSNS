@@ -218,7 +218,6 @@ namespace QLHSNS.Services {
 					dataFromDb.Name = request.Name;
 					dataFromDb.Description = request.Description;
 					dataFromDb.Price = request.Price;
-					dataFromDb.Status = request.Status;
 
 					await _dbContext.SaveChangesAsync();
 
