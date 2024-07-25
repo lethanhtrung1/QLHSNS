@@ -216,10 +216,15 @@ namespace QLHSNS.Services {
 		public async Task<ApiResponse<List<ContractType>>> GetAllAsync(int status) {
 			var data = new List<ContractType>();
 
-			if(status == -1)
+			if (status == FilterStatus.All)
 				data = await _dbContext.ContractTypes.ToListAsync();
-			else
+			else if (status == FilterStatus.Active || status == FilterStatus.NonActive)
 				data = await _dbContext.ContractTypes.Where(x => x.Status == status).ToListAsync();
+			else
+				return new ApiResponse<List<ContractType>> {
+					IsSuccess = false,
+					Message = Message.INVALID_PAYLOAD
+				};
 
 			if (data == null || data.Count == 0) {
 				return new ApiResponse<List<ContractType>> {

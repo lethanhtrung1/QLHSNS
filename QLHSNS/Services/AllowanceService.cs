@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using QLHSNS.Constants;
 using QLHSNS.Data;
 using QLHSNS.DTOs.Pagination;
 using QLHSNS.DTOs.Request.Allowance;
@@ -232,10 +233,16 @@ namespace QLHSNS.Services {
 		public async Task<ApiResponse<List<AllowanceResponseDto>>> GetAllAsync(int status) {
 			try {
 				var data = new List<Allowance>();
-				if(status == 0 || status == 1)
+
+				if (status == FilterStatus.Active || status == FilterStatus.NonActive)
 					data = await _dbContext.Allowances.Where(x => x.Status == status).ToListAsync();
-				else if (status == -1)
+				else if (status == FilterStatus.All)
 					data = await _dbContext.Allowances.ToListAsync();
+				else
+					return new ApiResponse<List<AllowanceResponseDto>> {
+						IsSuccess = false,
+						Message = Message.INVALID_PAYLOAD
+					};
 
 				if (data == null || data.Count == 0) {
 					return new ApiResponse<List<AllowanceResponseDto>> {

@@ -131,10 +131,16 @@ namespace QLHSNS.Services {
 			try {
 				var data = new List<HealthCare>();
 
-				if (status == -1)
+				if (status == FilterStatus.All)
 					data = await _dbContext.HealthCares.ToListAsync();
-				else
+				else if (status == FilterStatus.Active || status == FilterStatus.NonActive)
 					data = await _dbContext.HealthCares.Where(x => x.Status == status).ToListAsync();
+				else {
+					return new ApiResponse<List<HealthCare>> {
+						IsSuccess = false,
+						Message = Message.INVALID_PAYLOAD
+					};
+				}
 
 				if (data == null || data.Count == 0) {
 					return new ApiResponse<List<HealthCare>> {
@@ -157,8 +163,7 @@ namespace QLHSNS.Services {
 
 		public async Task<ApiResponse<HealthCare>> GetHealthCareByIdAsync(Guid id) {
 			try {
-				var dataFromDb = await _dbContext.HealthCares.Where(x => x.Id == id && x.Status == 1)
-											.FirstOrDefaultAsync();
+				var dataFromDb = await _dbContext.HealthCares.Where(x => x.Id == id).FirstOrDefaultAsync();
 
 				if (dataFromDb == null) {
 					return new ApiResponse<HealthCare> {
@@ -181,8 +186,7 @@ namespace QLHSNS.Services {
 
 		public async Task<ApiResponse<PagedResult<HealthCare>>> GetHealthCaresAsync(PagingRequestBase request) {
 			try {
-				var data = await _dbContext.HealthCares.Where(x => x.Status == 1)
-									.Skip((request.PageNumber - 1) * request.PageSize)
+				var data = await _dbContext.HealthCares.Skip((request.PageNumber - 1) * request.PageSize)
 									.Take(request.PageSize).ToListAsync();
 
 				if (data == null || data.Count == 0) {
@@ -192,7 +196,7 @@ namespace QLHSNS.Services {
 					};
 				}
 
-				int totalRecord = await _dbContext.HealthCares.Where(x => x.Status == 1).CountAsync();
+				int totalRecord = await _dbContext.HealthCares.CountAsync();
 
 				return new ApiResponse<PagedResult<HealthCare>> {
 					IsSuccess = true,

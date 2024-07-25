@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using QLHSNS.Constants;
 using QLHSNS.Data;
 using QLHSNS.DTOs.Pagination;
 using QLHSNS.DTOs.Response;
@@ -80,11 +81,17 @@ namespace QLHSNS.Services {
 		public async Task<ApiResponse<List<BankBranchDto>>> GetAllAsync(int status) {
 			try {
 				var data = new List<BankBranch>();
-				if (status == 0 || status == 1)
+
+				if (status == FilterStatus.Active || status == FilterStatus.NonActive)
 					data = await _dbContext.BankBranches.Include(x => x.Bank)
-						.Where(x => x.Status == 1 && x.Bank.Status == 1).ToListAsync();
-				else
+						.Where(x => x.Status == status && x.Bank.Status == 1).ToListAsync();
+				else if (status == FilterStatus.All)
 					data = await _dbContext.BankBranches.Include(x => x.Bank).Where(x => x.Bank.Status == 1).ToListAsync();
+				else
+					return new ApiResponse<List<BankBranchDto>> {
+						IsSuccess = false,
+						Message = Message.INVALID_PAYLOAD
+					};
 
 				if (data == null || data.Count == 0) {
 					return new ApiResponse<List<BankBranchDto>> {
@@ -109,8 +116,8 @@ namespace QLHSNS.Services {
 
 		public async Task<ApiResponse<BankBranchResponseDto>> GetBankBranchByIdAsync(Guid id) {
 			try {
-				var data = await _dbContext.BankBranches.Where(x => x.Id == id && x.Status == 1)
-														.Include(x => x.Bank).FirstOrDefaultAsync();
+				var data = await _dbContext.BankBranches.Where(x => x.Id == id)
+									.Include(x => x.Bank).FirstOrDefaultAsync();
 
 				if (data == null) {
 					return new ApiResponse<BankBranchResponseDto>() {
@@ -136,7 +143,7 @@ namespace QLHSNS.Services {
 		public async Task<ApiResponse<PagedResult<BankBranchResponseDto>>> GetBankBranchesAsync(PagingRequestBase request) {
 			try {
 				if (request != null) {
-					var data = await _dbContext.BankBranches.Where(x => x.Status == 1)
+					var data = await _dbContext.BankBranches
 									.Include(x => x.Bank)
 									.Skip((request.PageNumber - 1) * request.PageSize)
 									.Take(request.PageSize).ToListAsync();
@@ -170,7 +177,8 @@ namespace QLHSNS.Services {
 
 		public async Task<ApiResponse<List<BankBranchDto>>> GetByBankIdAsync(Guid BankId, int status) {
 			try {
-				var checkBank = await _dbContext.Banks.Where(x => x.Id == BankId && x.Status == status).FirstOrDefaultAsync();
+				var checkBank = await _dbContext.Banks.Where(x => x.Id == BankId && x.Status == 1).FirstOrDefaultAsync();
+
 				if (checkBank == null) {
 					return new ApiResponse<List<BankBranchDto>> {
 						IsSuccess = false,
@@ -178,10 +186,16 @@ namespace QLHSNS.Services {
 					};
 				}
 				var data = new List<BankBranch>();
-				if (status == 0 || status == 1)
+				if (status == FilterStatus.Active || status == FilterStatus.NonActive)
 					data = await _dbContext.BankBranches.Where(x => x.BankId == BankId && x.Status == status).Include(x => x.Bank).ToListAsync();
-				else
+				else if (status == FilterStatus.All)
 					data = await _dbContext.BankBranches.Where(x => x.BankId == BankId).Include(x => x.Bank).ToListAsync();
+				else {
+					return new ApiResponse<List<BankBranchDto>> {
+						IsSuccess = false,
+						Message = Message.INVALID_PAYLOAD
+					};
+				}
 
 				if (data == null || data.Count == 0) {
 					return new ApiResponse<List<BankBranchDto>> {

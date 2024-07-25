@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using QLHSNS.Constants;
 using QLHSNS.Data;
 using QLHSNS.DTOs.Pagination;
 using QLHSNS.DTOs.Response;
@@ -117,10 +118,15 @@ namespace QLHSNS.Services {
 		public async Task<ApiResponse<List<BankResponseDto>>> FilterBank(int status) {
 			try {
 				var data = new List<Bank>();
-				if (status == 0 || status == 1)
+				if (status == FilterStatus.All)
+					data = await _dbContext.Banks.ToListAsync();
+				else if (status == FilterStatus.Active || status == FilterStatus.NonActive)
 					data = await _dbContext.Banks.Where(x => x.Status == status).ToListAsync();
 				else
-					data = await _dbContext.Banks.ToListAsync();
+					return new ApiResponse<List<BankResponseDto>> {
+						IsSuccess = false,
+						Message = Message.INVALID_PAYLOAD
+					};
 
 				if (data == null || data.Count == 0) {
 					return new ApiResponse<List<BankResponseDto>>() {
@@ -145,7 +151,7 @@ namespace QLHSNS.Services {
 
 		public async Task<ApiResponse<BankResponseDto>> GetBankByIdAsync(Guid id) {
 			try {
-				var data = await _dbContext.Banks.Where(x => x.Id == id && x.Status == 1).FirstOrDefaultAsync();
+				var data = await _dbContext.Banks.Where(x => x.Id == id).FirstOrDefaultAsync();
 
 				if (data == null) {
 					return new ApiResponse<BankResponseDto>() {
@@ -171,7 +177,7 @@ namespace QLHSNS.Services {
 		public async Task<ApiResponse<PagedResult<BankResponseDto>>> GetBanksAsync(PagingRequestBase request) {
 			try {
 				if (request != null) {
-					var data = await _dbContext.Banks.Where(x => x.Status == 1)
+					var data = await _dbContext.Banks
 									.Skip((request.PageNumber - 1) * request.PageSize)
 									.Take(request.PageSize).ToListAsync();
 

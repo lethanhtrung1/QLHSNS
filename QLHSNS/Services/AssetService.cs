@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using QLHSNS.Constants;
 using QLHSNS.Data;
 using QLHSNS.DTOs.Pagination;
 using QLHSNS.DTOs.Request.Asset;
@@ -184,10 +185,15 @@ namespace QLHSNS.Services {
 			try {
 				var data = new List<Asset>();
 
-				if(status == -1)
+				if (status == FilterStatus.All)
 					data = await _dbContext.Assets.ToListAsync();
-				else
+				else if (status == FilterStatus.Active || status == FilterStatus.NonActive)
 					data = await _dbContext.Assets.Where(x => x.Status == status).ToListAsync();
+				else
+					return new ApiResponse<List<AssetResponseDto>> {
+						IsSuccess = false,
+						Message = Message.INVALID_PAYLOAD
+					};
 
 				if (data == null || data.Count == 0) {
 					return new ApiResponse<List<AssetResponseDto>> {

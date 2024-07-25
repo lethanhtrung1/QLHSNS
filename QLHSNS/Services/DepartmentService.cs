@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using QLHSNS.Constants;
 using QLHSNS.Data;
 using QLHSNS.DTOs.Pagination;
 using QLHSNS.DTOs.Request.Department;
@@ -75,7 +76,7 @@ namespace QLHSNS.Services {
 					var newDepartment = _mapper.Map<Department>(request);
 					await _dbContext.Departments.AddAsync(newDepartment);
 
-					if(request.JobTitleIds != null && request.JobTitleIds.Count >  0) {
+					if (request.JobTitleIds != null && request.JobTitleIds.Count > 0) {
 						foreach (var item in request.JobTitleIds) {
 							var dataDto = new CreateDepartmentJobTitleDto {
 								DepartmentId = newDepartment.Id,
@@ -203,10 +204,16 @@ namespace QLHSNS.Services {
 		public async Task<ApiResponse<List<DepartmentBaseResponseDto>>> GetAllAsync(int status) {
 			try {
 				var data = new List<Department>();
-				if(status == 0 || status == 1)
+				if (status == FilterStatus.Active || status == FilterStatus.NonActive) {
 					data = await _dbContext.Departments.Where(x => x.Status == status).ToListAsync();
-				else
+				} else if (status == FilterStatus.All) {
 					data = await _dbContext.Departments.ToListAsync();
+				} else {
+					return new ApiResponse<List<DepartmentBaseResponseDto>> {
+						IsSuccess = false,
+						Message = Message.INVALID_PAYLOAD
+					};
+				}
 
 				if (data == null || data.Count == 0) {
 					return new ApiResponse<List<DepartmentBaseResponseDto>> {

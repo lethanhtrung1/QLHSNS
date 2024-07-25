@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using QLHSNS.Constants;
 using QLHSNS.Data;
 using QLHSNS.DTOs.Pagination;
 using QLHSNS.DTOs.Request.JobTitle;
@@ -167,7 +168,7 @@ namespace QLHSNS.Services {
 		public async Task<ApiResponse<List<JobTitleResponseDto>>> GetAllJobTitle(int status) {
 			try {
 				var data = new List<JobTitleResponseDto>();
-				if (status == -1)
+				if (status == FilterStatus.All) {
 					data = await _dbContext.JobTitles.Select(x => new JobTitleResponseDto {
 						Id = x.Id,
 						JobTitleName = x.JobTitleName,
@@ -175,7 +176,7 @@ namespace QLHSNS.Services {
 						CreatedAt = x.CreatedAt,
 						UpdatedAt = x.UpdatedAt,
 					}).ToListAsync();
-				else
+				} else if (status == FilterStatus.Active || status == FilterStatus.NonActive) {
 					data = await _dbContext.JobTitles.Where(x => x.Status == status)
 								 .Select(x => new JobTitleResponseDto {
 									 Id = x.Id,
@@ -184,6 +185,12 @@ namespace QLHSNS.Services {
 									 CreatedAt = x.CreatedAt,
 									 UpdatedAt = x.UpdatedAt,
 								 }).ToListAsync();
+				} else {
+					return new ApiResponse<List<JobTitleResponseDto>> {
+						IsSuccess = false,
+						Message = Message.INVALID_PAYLOAD
+					};
+				}
 
 				if (data == null || data.Count == 0) {
 					return new ApiResponse<List<JobTitleResponseDto>> {
