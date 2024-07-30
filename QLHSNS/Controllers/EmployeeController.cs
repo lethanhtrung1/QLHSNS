@@ -21,7 +21,7 @@ namespace QLHSNS.Controllers {
 			return await _service.GetEmployeeByIdAsync(id);
 		}
 
-		[HttpPost("CreateEmployeeAsset")]
+		[HttpPost("AddEmployeeAsset")]
 		public async Task<ApiResponse<EmployeeAssetResponseDto>> CreateEmployeeAsset(EmployeeAssetRequestDto request) {
 			return await _service.CreateEmployeeAssetsAsync(request);
 		}

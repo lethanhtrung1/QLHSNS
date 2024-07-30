@@ -12,8 +12,8 @@ namespace QLHSNS.Model {
 		public DateTime CreatedAt { get; set; }
 		public DateTime UpdatedAt { get; set; }
 
-		public List<PayrollAllowance> PayrollAllowances { get; set; }
-		public List<PayrollBenefit> PayrollBenefits { get; set; }
+		public virtual List<PayrollAllowance> PayrollAllowances { get; set; }
+		public virtual List<PayrollBenefit> PayrollBenefits { get; set; }
 		public virtual List<Contract> Contracts { get; set; }
 	}
 }

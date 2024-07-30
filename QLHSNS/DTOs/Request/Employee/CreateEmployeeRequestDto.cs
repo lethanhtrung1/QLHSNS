@@ -4,7 +4,7 @@
 		public Guid DepartmentId { get; set; }
 		public Guid JobTitleId { get; set; }
 		public string Name { get; set; }
-		public DateTime DateOfBirth { get; set; }
+		public DateOnly DateOfBirth { get; set; }
 		public int Gender { get; set; }
 		public string Cccd { get; set; }
 		public Guid? LocationId { get; set; }

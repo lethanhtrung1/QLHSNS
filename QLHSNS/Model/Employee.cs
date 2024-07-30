@@ -7,7 +7,7 @@ namespace QLHSNS.Model {
 		public Guid DepartmentId { get; set; }
 		public Guid JobTitleId { get; set; }
 		public string Name { get; set; }
-		public DateTime DateOfBirth { get; set; }
+		public DateOnly DateOfBirth { get; set; }
 		public int Gender { get; set; }
 		public string Cccd { get; set; }
 		public Guid? LocationId { get; set; }
@@ -17,17 +17,22 @@ namespace QLHSNS.Model {
 		public Guid? BankBranchId { get; set; }
 		public Guid? HealthCareId { get; set; }
 		public int IsWorking { get; set; }
+
 		public DateTime CreatedAt { get; set; }
 		public DateTime UpdatedAt { get; set; }
+
 		public Department Department { get; set; }
 		public JobTitle JobTitle { get; set; }
 		public Location? Location { get; set; }
 		public BankBranch? BankBranch { get; set; }
-		public List<EmployeeAsset>? EmployeeAssets { get; set; }
+		public virtual List<EmployeeAsset>? EmployeeAssets { get; set; }
 		public EmployeeFamily? EmployeeFamily { get; set; }
 		public HealthCare? HealthCare { get; set; }
 		public virtual List<Contract> Contracts { get; set; }
-		public List<OverTime> OverTimes { get; set; }
+		public virtual List<OverTime> OverTimes { get; set; }
 		public virtual List<Reward> Rewards { get; set; }
+
+		public DateOnly DateOfJoining { get; set; }
+		public DateOnly? DateOfLeaving { get; set; }
 	}
 }

@@ -1,7 +1,11 @@
 using AutoMapper;
+using Hangfire;
 using Microsoft.EntityFrameworkCore;
+using QLHSNS.Common.Implementations;
+using QLHSNS.Common.Interfaces;
 using QLHSNS.Data;
 using QLHSNS.MappingConfigurations;
+using QLHSNS.Options;
 using QLHSNS.Services;
 using QLHSNS.Services.IServices;
 
@@ -14,10 +18,14 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Connect to DB
 builder.Services.AddDbContext<AppDbContext>(option => {
 	option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
+builder.Services.Configure<GmailOptions>(builder.Configuration.GetSection(GmailOptions.GmailOptionsKey));
+
+// Config auto mapper
 IMapper mapper = MappingConfig.RegisterMaps().CreateMapper();
 builder.Services.AddSingleton(mapper);
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
@@ -41,6 +49,19 @@ builder.Services.AddScoped<IRewardService, RewardService>();
 builder.Services.AddScoped<IPayrollAllowanceService, PayrollAllowanceService>();
 builder.Services.AddScoped<IPayrollBenefitService, PayrollBenefitService>();
 
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IReminderService, ReminderService>();
+
+// Hangfire Client
+builder.Services.AddHangfire(config => config
+	.SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+	.UseSimpleAssemblyNameTypeSerializer()
+	.UseRecommendedSerializerSettings()
+	.UseSqlServerStorage(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Hangfire Server
+builder.Services.AddHangfireServer();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -55,4 +76,31 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+app.UseHangfireDashboard();
+app.UseHangfireDashboard("/hangfire");
+
+RecurringJob.AddOrUpdate("TestHangfire", () => Console.WriteLine("Hello from hangfire"), "* * * * *");
+
+Reminder();
+
 app.Run();
+
+void Reminder() {
+	//using (var scope = app.Services.CreateScope()) {
+	//	var reminder = scope.ServiceProvider.GetService<ReminderService>();
+
+	RecurringJob.AddOrUpdate<IReminderService>(
+		recurringJobId: "ReminderBirthdayJob",
+		methodCall: x => x.BirthdayReminder(),
+		cronExpression: Cron.Daily(7, 0),
+		options: new RecurringJobOptions()
+	);
+
+	RecurringJob.AddOrUpdate<IReminderService>(
+		recurringJobId: "ReminderEmployeeContractExpiryJob",
+		methodCall: x => x.EmployeeContractExpiryReminder(),
+		cronExpression: Cron.Daily(8, 0),
+		options: new RecurringJobOptions()
+	);
+	//}
+}

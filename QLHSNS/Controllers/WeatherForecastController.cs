@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using QLHSNS.Common.Interfaces;
+using QLHSNS.DTOs.SendEmail;
 
 namespace QLHSNS.Controllers {
 	[ApiController]
@@ -11,8 +13,11 @@ namespace QLHSNS.Controllers {
 
 		private readonly ILogger<WeatherForecastController> _logger;
 
-		public WeatherForecastController(ILogger<WeatherForecastController> logger) {
+		private readonly IEmailService _emailService;
+
+		public WeatherForecastController(ILogger<WeatherForecastController> logger, IEmailService emailService) {
 			_logger = logger;
+			_emailService = emailService;
 		}
 
 		[HttpGet(Name = "GetWeatherForecast")]
@@ -23,6 +28,12 @@ namespace QLHSNS.Controllers {
 				Summary = Summaries[Random.Shared.Next(Summaries.Length)]
 			})
 			.ToArray();
+		}
+
+		[HttpPost("TestSendEmail")]
+		public async Task<IActionResult> TestSendEmail([FromBody] SendEmailRequest sendEmailRequest) {
+			await _emailService.SendEmailAsync(sendEmailRequest);
+			return Ok("Email sent succesfully");
 		}
 	}
 }
