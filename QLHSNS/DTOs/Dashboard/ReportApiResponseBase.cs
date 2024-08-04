@@ -8,7 +8,7 @@
 	public class ReportData {
 		public int? ValueOrder { get; set; }
 		public string? FieldName { get; set; }
-		public string? Value { get; set; }
+		public string? FieldValue { get; set; }
 		public string? Rate { get; set; }
 	}
 }

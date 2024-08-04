@@ -29,8 +29,8 @@ namespace QLHSNS.Model {
 		public EmployeeFamily? EmployeeFamily { get; set; }
 		public HealthCare? HealthCare { get; set; }
 		public virtual List<Contract> Contracts { get; set; }
-		public virtual List<OverTime> OverTimes { get; set; }
-		public virtual List<Reward> Rewards { get; set; }
+		public virtual List<OverTime>? OverTimes { get; set; }
+		public virtual List<Reward>? Rewards { get; set; }
 
 		public DateOnly DateOfJoining { get; set; }
 		public DateOnly? DateOfLeaving { get; set; }
