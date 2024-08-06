@@ -16,5 +16,6 @@ namespace QLHSNS.Services.IServices {
 		Task<ApiResponse<FileResponseDto>> DownloadFile(Guid id);
 		Task<ApiResponse<PagedResult<ContractResponseDto>>> FilterAsync(FilterContractRequestDto request);
 		Task<ApiResponse<List<AttachmentResponseDto>>> GetAllFileByContractIdAsync(Guid id);
+		Task<ApiResponse<GetTotalEmployeeSalaryResponseDto>> GetTotalEmployeeSalary(GetTotalEmployeeSalaryRequestDto request);
 	}
 }

@@ -738,5 +738,107 @@ namespace QLHSNS.Services {
 
 			return contractDto;
 		}
+
+		public async Task<ApiResponse<GetTotalEmployeeSalaryResponseDto>> GetTotalEmployeeSalary(GetTotalEmployeeSalaryRequestDto request) {
+			try {
+				var checkEmployee = await _dbContext.Employees.Where(x => x.Id == request.EmployeeId).FirstOrDefaultAsync();
+
+				if (checkEmployee == null) {
+					return new ApiResponse<GetTotalEmployeeSalaryResponseDto> {
+						IsSuccess = false,
+						Message = Message.DATA_NOT_FOUND
+					};
+				}
+
+				var contract = await _dbContext.Contracts.Where(x => x.EmployeeId == request.EmployeeId && x.IsDeleted == 0).FirstOrDefaultAsync();
+
+				if (contract == null) {
+					return new ApiResponse<GetTotalEmployeeSalaryResponseDto> {
+						IsSuccess = false,
+						Message = Message.DATA_NOT_FOUND
+					};
+				}
+
+				var result = new GetTotalEmployeeSalaryResponseDto {
+					EmployeeId = request.EmployeeId,
+					Month = request.Month,
+					Year = request.Year,
+				};
+
+				result.EmployeeName = await _dbContext.Employees.Where(x => x.Id == request.EmployeeId).Select(x => x.Name).FirstOrDefaultAsync();
+
+				var payroll = await _dbContext.Payrolls.Where(x => x.Id == contract.PayrollId && x.Status == 1)
+														.Select(x => new ContractPayrollDto {
+															Id = x.Id,
+															BasicSalary = x.BasicSalary,
+															SalaryCoefficient = x.SalaryCoefficient,
+															Notes = x.Notes
+														}).FirstOrDefaultAsync();
+
+				var totalSalary = payroll != null ? payroll.BasicSalary * (decimal)payroll.SalaryCoefficient : 0; ;
+
+				var totalOverTime = await _dbContext.OverTimes
+					.Where(x => x.EmployeeId == request.EmployeeId &&
+					x.OverTimeDate.Month == request.Month &&
+					x.OverTimeDate.Year == request.Year)
+					.SumAsync(x => x.TotalHour);
+
+				var ot = await _dbContext.Allowances.Where(x => x.AllowanceName == "Phụ cấp OT").Select(x => x.Value).FirstOrDefaultAsync();
+
+				totalSalary += totalOverTime * ot;
+
+
+				var contractAllowances = await (from p in _dbContext.Payrolls.Where(x => x.Id == contract.PayrollId && x.Status == 1)
+												join pa in _dbContext.PayrollAllowances on p.Id equals pa.PayrollId
+												join a in _dbContext.Allowances.Where(x => x.Status == 1) on pa.AllowanceId equals a.Id into temp
+												from t in temp.DefaultIfEmpty()
+												select new PayrollAllowanceResponseDto {
+													Id = t.Id,
+													Name = t.AllowanceName,
+													Value = t.Value,
+													Unit = t.Unit,
+												}).ToListAsync();
+
+				var contractBenefits = await (from p in _dbContext.Payrolls.Where(x => x.Id == contract.PayrollId && x.Status == 1)
+											  join pb in _dbContext.PayrollBenefits on p.Id equals pb.PayrollId
+											  join b in _dbContext.Benefits.Where(x => x.Status == 1) on pb.BenefitId equals b.Id into temp
+											  from t in temp.DefaultIfEmpty()
+											  select new PayrollBenefitResponseDto {
+												  Id = t.Id,
+												  Name = t.BenefitName,
+												  Amount = t.Amount,
+												  Description = t.Description,
+											  }).ToListAsync();
+
+				if (contractAllowances != null && contractAllowances.Count > 0) {
+					foreach (var item in contractAllowances) {
+						// if Allowance is not OT
+						if (_dbContext.Allowances.Where(x => x.Id == item.Id && x.Status == 1).Select(x => x.Unit).FirstOrDefault() == "Month") {
+							totalSalary += await _dbContext.Allowances.Where(x => x.Id == item.Id && x.Status == 1)
+																	  .Select(x => x.Value).FirstOrDefaultAsync();
+						}
+					}
+				}
+
+				if (contractBenefits != null && contractBenefits.Count > 0) {
+					foreach (var item in contractBenefits) {
+						totalSalary += await _dbContext.Benefits.Where(x => x.Id == item.Id && x.Status == 1)
+																.Select(x => x.Amount).FirstOrDefaultAsync();
+					}
+				}
+
+				result.TotalSalary = totalSalary;
+
+				return new ApiResponse<GetTotalEmployeeSalaryResponseDto> {
+					IsSuccess = true,
+					Data = result,
+				};
+			} catch (Exception ex) {
+				return new ApiResponse<GetTotalEmployeeSalaryResponseDto> {
+					IsSuccess = false,
+					Message = ex.Message
+				};
+			}
+		}
 	}
 }

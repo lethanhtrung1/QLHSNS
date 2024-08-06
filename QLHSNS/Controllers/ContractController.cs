@@ -76,5 +76,10 @@ namespace QLHSNS.Controllers {
 		public async Task<ApiResponse<PagedResult<ContractResponseDto>>> Filter(FilterContractRequestDto request) {
 			return await _service.FilterAsync(request);
 		}
+
+		[HttpPost("GetTotalEmployeeSalary")]
+		public async Task<ApiResponse<GetTotalEmployeeSalaryResponseDto>> GetTotalEmployeeSalary(GetTotalEmployeeSalaryRequestDto request) {
+			return await _service.GetTotalEmployeeSalary(request);
+		}
 	}
 }
