@@ -25,7 +25,7 @@ namespace QLHSNS.Services {
 			foreach (var item in payrollAllowanceIds) {
 				var payrollAllowace = new PayrollAllowaceDto() {
 					PayrollId = payrollId,
-					AllowaceId = item
+					AllowanceId = item
 				};
 				var newPayrollAllowace = _mapper.Map<PayrollAllowance>(payrollAllowace);
 				await _dbContext.PayrollAllowances.AddAsync(newPayrollAllowace);

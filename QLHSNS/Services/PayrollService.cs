@@ -23,9 +23,9 @@ namespace QLHSNS.Services {
 			try {
 				if (request != null) {
 					var newPayroll = _mapper.Map<Payroll>(request);
+					newPayroll.Id = Guid.NewGuid();
 
 					var totalSalary = request.BasicSalary * (decimal)request.SalaryCoefficient;
-
 
 					// Add new PayrollAllowace
 					if (request.AllowaceIds != null && request.AllowaceIds.Count > 0) {
@@ -34,7 +34,7 @@ namespace QLHSNS.Services {
 							if (_dbContext.Allowances.Where(x => x.Id == item).Select(x => x.Status).FirstOrDefault() == 1) {
 								var payrollAllowace = new PayrollAllowaceDto() {
 									PayrollId = newPayroll.Id,
-									AllowaceId = item
+									AllowanceId = item
 								};
 								var newPayrollAllowace = _mapper.Map<PayrollAllowance>(payrollAllowace);
 								await _dbContext.PayrollAllowances.AddAsync(newPayrollAllowace);
@@ -422,7 +422,7 @@ namespace QLHSNS.Services {
 						foreach (var item in allowanceToAdd) {
 							var newPayrollAllowanceDto = new PayrollAllowaceDto {
 								PayrollId = request.Id,
-								AllowaceId = item
+								AllowanceId = item
 							};
 							var newPayrollAllowance = _mapper.Map<PayrollAllowance>(newPayrollAllowanceDto);
 							await _dbContext.PayrollAllowances.AddAsync(newPayrollAllowance);
