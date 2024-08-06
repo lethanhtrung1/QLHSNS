@@ -10,8 +10,8 @@ namespace QLHSNS.Model {
 
 		//public string? FilePath { get; set; }
 		public int IsDeleted { get; set; } = 0;
-		public DateOnly StartDate { get; set; }
-		public DateOnly EndDate { get; set; }
+		public DateTime StartDate { get; set; }
+		public DateTime EndDate { get; set; }
 
 		public ContractType ContractType { get; set; }
 		public Employee Employee { get; set; }

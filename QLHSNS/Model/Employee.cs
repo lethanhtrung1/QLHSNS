@@ -7,7 +7,7 @@ namespace QLHSNS.Model {
 		public Guid DepartmentId { get; set; }
 		public Guid JobTitleId { get; set; }
 		public string Name { get; set; }
-		public DateOnly DateOfBirth { get; set; }
+		public DateTime DateOfBirth { get; set; }
 		public int Gender { get; set; }
 		public string Cccd { get; set; }
 		public Guid? LocationId { get; set; }
@@ -32,7 +32,7 @@ namespace QLHSNS.Model {
 		public virtual List<OverTime>? OverTimes { get; set; }
 		public virtual List<Reward>? Rewards { get; set; }
 
-		public DateOnly DateOfJoining { get; set; }
-		public DateOnly? DateOfLeaving { get; set; }
+		public DateTime DateOfJoining { get; set; }
+		public DateTime? DateOfLeaving { get; set; }
 	}
 }

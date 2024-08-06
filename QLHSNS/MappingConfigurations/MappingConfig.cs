@@ -46,7 +46,10 @@ namespace QLHSNS.MappingConfigurations {
 				config.CreateMap<Department, DepartmentBaseResponseDto>();
 
 
-				config.CreateMap<Employee, EmployeeResponseDto>();
+				config.CreateMap<Employee, EmployeeResponseDto>()
+					.ForMember(
+						dest => dest.DateOfBirth,
+						opt => opt.MapFrom(src => src.DateOfBirth.Date));
 				config.CreateMap<EmployeeAsset, EmployeeAssetDto>();
 
 				config.CreateMap<Bank, BankResponseDto>();
@@ -72,6 +75,7 @@ namespace QLHSNS.MappingConfigurations {
 				config.CreateMap<Payroll, PayrollResponseDto>();
 
 				config.CreateMap<Contract, ContractResponseDto>();
+
 				config.CreateMap<Attachment, AttachmentResponseDto>();
 
 				config.CreateMap<EmployeeFamilyDetail, EmployeeFamilyDetailResponseDto>();
@@ -80,6 +84,11 @@ namespace QLHSNS.MappingConfigurations {
 					.ForMember(
 						dest => dest.FamilyDetails,
 						opt => opt.MapFrom(src => new List<EmployeeFamilyDetailResponseDto>()));
+
+				config.CreateMap<ContractType, ContractTypeDto>()
+					.ForMember(
+						dest => dest.Name,
+						opt => opt.MapFrom(src => src.ContractTypeName));
 
 				#endregion
 
@@ -126,7 +135,10 @@ namespace QLHSNS.MappingConfigurations {
 				config.CreateMap<CreateEmployeeRequestDto, Employee>()
 					.ForMember(
 						dest => dest.IsWorking,
-						opt => opt.MapFrom(src => 1));
+						opt => opt.MapFrom(src => 1))
+					.ForMember(
+						dest => dest.DateOfJoining,
+						opt => opt.MapFrom(src => DateTime.Now.Date));
 
 				config.CreateMap<CreateHealthCareRequestDto, HealthCare>()
 					.ForMember(dest => dest.Status, opt => opt.MapFrom(src => 1));

@@ -2,7 +2,7 @@
 	public class EmployeeResponseDto {
 		public Guid Id { get; set; }
 		public string Name { get; set; }
-		public DateOnly DateOfBirth { get; set; }
+		public DateTime DateOfBirth { get; set; }
 		public int Gender { get; set; }
 		public string Cccd { get; set; }
 		public EmployeeCVDto? Address { get; set; }

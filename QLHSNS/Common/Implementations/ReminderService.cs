@@ -14,7 +14,11 @@ namespace QLHSNS.Common.Implementations {
 		}
 
 		public async Task BirthdayReminder() {
-			var employees = await _dbContext.Employees.Where(x => x.DateOfBirth == DateOnly.FromDateTime(DateTime.Now)).ToListAsync();
+			var employees = await _dbContext.Employees
+				.Where(x => x.DateOfBirth.Year == DateTime.Now.Year && 
+				x.DateOfBirth.Month == DateTime.Now.Month && 
+				x.DateOfBirth.Date == DateTime.Now.Date)
+				.ToListAsync();
 
 			if (employees != null && employees.Count != 0) {
 				foreach (var employee in employees) {
@@ -58,7 +62,11 @@ namespace QLHSNS.Common.Implementations {
 		}
 
 		public async Task EmployeeContractExpiryReminder() {
-			var contracts = await _dbContext.Contracts.Where(x => x.EndDate == DateOnly.FromDateTime(DateTime.Now) && x.IsDeleted == 0).ToListAsync();
+			var contracts = await _dbContext.Contracts
+				.Where(x => x.EndDate.Year == DateTime.Now.Year && 
+				x.EndDate.Month == DateTime.Now.Month && 
+				x.EndDate.Date == DateTime.Now.Date && 
+				x.IsDeleted == 0).ToListAsync();
 
 			if (contracts != null && contracts.Count != 0) {
 				foreach (var contract in contracts) {

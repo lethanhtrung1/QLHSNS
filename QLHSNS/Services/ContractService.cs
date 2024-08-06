@@ -53,11 +53,7 @@ namespace QLHSNS.Services {
 					await _dbContext.SaveChangesAsync();
 
 					// Get new contract from db
-					var contractType = await _dbContext.ContractTypes.Where(x => x.Id == newContract.ContractTypeId && x.Status == 1)
-					.Select(x => new ContractTypeDto {
-						Id = x.Id,
-						Name = x.ContractTypeName
-					}).FirstOrDefaultAsync();
+					var contractType = await _dbContext.ContractTypes.Where(x => x.Id == newContract.ContractTypeId && x.Status == 1).FirstOrDefaultAsync();
 
 					var employee = await (from e in _dbContext.Employees.Where(x => x.Id == newContract.EmployeeId)
 										  join d in _dbContext.Departments.Where(x => x.Status == 1) on e.DepartmentId equals d.Id
@@ -133,11 +129,12 @@ namespace QLHSNS.Services {
 
 					payroll.TotalSalary = totalSalary;
 
-					var result = _mapper.Map<ContractResponseDto>(newContract);
+					var newContractFromDb = await _dbContext.Contracts.Where(x => x.Id == newContract.Id).FirstOrDefaultAsync();
+					var result = _mapper.Map<ContractResponseDto>(newContractFromDb);
 
-					result.ContractType = contractType!;
-					result.Employee = employee!;
-					result.Payroll = payroll;
+					result.ContractTypeResponse = _mapper.Map<ContractTypeDto>(contractType);
+					result.EmployeeResponse = employee!;
+					result.PayrollResponse = payroll;
 
 					return new ApiResponse<ContractResponseDto> {
 						Data = result,
@@ -331,10 +328,7 @@ namespace QLHSNS.Services {
 
 					// Get data after update
 					var contractType = await _dbContext.ContractTypes.Where(x => x.Id == contractFromDb.ContractTypeId && x.Status == 1)
-																	.Select(x => new ContractTypeDto {
-																		Id = x.Id,
-																		Name = x.ContractTypeName
-																	}).FirstOrDefaultAsync();
+																	.FirstOrDefaultAsync();
 
 					var employee = await (from e in _dbContext.Employees.Where(x => x.Id == contractFromDb.EmployeeId)
 										  join d in _dbContext.Departments.Where(x => x.Status == 1) on e.DepartmentId equals d.Id
@@ -415,9 +409,9 @@ namespace QLHSNS.Services {
 
 					var result = _mapper.Map<ContractResponseDto>(contractFromDb);
 
-					result.ContractType = contractType!;
-					result.Employee = employee!;
-					result.Payroll = payroll;
+					result.ContractTypeResponse = _mapper.Map<ContractTypeDto>(contractType);
+					result.EmployeeResponse = employee!;
+					result.PayrollResponse = payroll;
 
 					return new ApiResponse<ContractResponseDto> {
 						Data = result,
@@ -727,9 +721,9 @@ namespace QLHSNS.Services {
 
 			var contractDto = _mapper.Map<ContractResponseDto>(contract);
 
-			contractDto.ContractType = contractType!;
-			contractDto.Employee = employee!;
-			contractDto.Payroll = payroll;
+			contractDto.ContractTypeResponse = contractType!;
+			contractDto.EmployeeResponse = employee!;
+			contractDto.PayrollResponse = payroll;
 
 			return contractDto;
 		}
