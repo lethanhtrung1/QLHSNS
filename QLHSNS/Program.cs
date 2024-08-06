@@ -49,6 +49,7 @@ builder.Services.AddScoped<IRewardService, RewardService>();
 builder.Services.AddScoped<IPayrollAllowanceService, PayrollAllowanceService>();
 builder.Services.AddScoped<IPayrollBenefitService, PayrollBenefitService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
+builder.Services.AddScoped<IOverTimeService, OverTimeService>();
 
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IReminderService, ReminderService>();

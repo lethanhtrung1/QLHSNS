@@ -8,7 +8,7 @@ namespace QLHSNS.Model {
 		//public int Month { get; set; }
 		//public int Year { get; set; }
 		public int TotalHour { get; set; }
-		public DateOnly OverTimeDate { get; set; }
+		public DateTime OverTimeDate { get; set; }
 
 		public Employee Employee { get; set; }
 	}

@@ -61,7 +61,7 @@ namespace QLHSNS.Services {
 			try {
 				if (request != null) {
 					var checkEmployeeFamily = await _dbContext.EmployeeFamilies
-						.Where(x => x.EmployeeId == request.EmployeeId).ToListAsync();
+						.Where(x => x.EmployeeId == request.EmployeeId).FirstOrDefaultAsync();
 
 					if (checkEmployeeFamily != null) {
 						return new ApiResponse<EmployeeFamilyResponseDto> {

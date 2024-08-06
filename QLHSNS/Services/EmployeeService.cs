@@ -27,7 +27,7 @@ namespace QLHSNS.Services {
 
 			employeeFromDb.IsWorking = 0;
 			employeeFromDb.UpdatedAt = DateTime.Now;
-			employeeFromDb.DateOfLeaving = DateTime.Now;
+			employeeFromDb.DateOfLeaving = DateTime.Now.Date;
 
 			await _dbContext.SaveChangesAsync();
 

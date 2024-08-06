@@ -9,6 +9,7 @@ using QLHSNS.DTOs.Request.EmployeeFamily;
 using QLHSNS.DTOs.Request.EmployeeRequestDto;
 using QLHSNS.DTOs.Request.HealthCareRequestDto;
 using QLHSNS.DTOs.Request.JobTitle;
+using QLHSNS.DTOs.Request.OverTime;
 using QLHSNS.DTOs.Request.Payroll;
 using QLHSNS.DTOs.Request.Reward;
 using QLHSNS.DTOs.Response.Allowance;
@@ -21,6 +22,7 @@ using QLHSNS.DTOs.Response.Department;
 using QLHSNS.DTOs.Response.Employee;
 using QLHSNS.DTOs.Response.EmployeeFamily;
 using QLHSNS.DTOs.Response.JobTitle;
+using QLHSNS.DTOs.Response.OverTime;
 using QLHSNS.DTOs.Response.Payroll;
 using QLHSNS.DTOs.Response.Reward;
 using QLHSNS.Model;
@@ -90,6 +92,8 @@ namespace QLHSNS.MappingConfigurations {
 						dest => dest.Name,
 						opt => opt.MapFrom(src => src.ContractTypeName));
 
+				config.CreateMap<OverTime, OverTimeResponse>();
+
 				#endregion
 
 
@@ -137,6 +141,9 @@ namespace QLHSNS.MappingConfigurations {
 						dest => dest.IsWorking,
 						opt => opt.MapFrom(src => 1))
 					.ForMember(
+						dest => dest.DateOfBirth,
+						opt => opt.MapFrom(src => src.DateOfBirth.Date))
+					.ForMember(
 						dest => dest.DateOfJoining,
 						opt => opt.MapFrom(src => DateTime.Now.Date));
 
@@ -159,7 +166,12 @@ namespace QLHSNS.MappingConfigurations {
 						dest => dest.IsDeleted,
 						opt => opt.MapFrom(src => 0));
 
-				config.CreateMap<AddEmployeeFamilyDetailRequestDto, EmployeeFamilyDetail>();
+				config.CreateMap<AddEmployeeFamilyDetailRequestDto, EmployeeFamilyDetail>()
+					.ForMember(
+						dest => dest.DateOfBirth,
+						opt => opt.MapFrom(src => src.DateOfBirth.Date));
+
+				config.CreateMap<CreateOverTimeRequestDto, OverTime>();
 
 				#endregion
 			});
