@@ -443,22 +443,23 @@ namespace QLHSNS.Services {
 					};
 				}
 
-				string wwwroot = _env.WebRootPath;
+				string filePath = "\\Upload\\ContractFile\\" + id.ToString();
+				string completeFilePath = _env.WebRootPath + filePath;
+
+				if (!Directory.Exists(filePath)) {
+					Directory.CreateDirectory(filePath);
+				}
 
 				foreach (var file in files) {
-					var fileName = Path.GetRandomFileName() + DateTime.Now.ToString("yyyy_MM_dd-HH_mm_ss") + "_" + file.FileName;
+					var fileName = DateTime.Now.ToString("yyyy_MM_dd-HH_mm_ss") + "_" + file.FileName;
 
-					//var extension = Path.GetExtension(fileName);
-					var filePath = Path.Combine(Directory.GetCurrentDirectory(), wwwroot + "\\Upload\\ContractFile");
+					var completeFileName = completeFilePath + "\\" + fileName;
 
-					if (!Directory.Exists(filePath)) {
-						Directory.CreateDirectory(filePath);
+					if (File.Exists(completeFileName)) {
+						File.Delete(completeFileName);
 					}
 
-					var folder = Path.Combine("\\Upload\\ContractFile", fileName);
-					var completePath = Path.Combine(Directory.GetCurrentDirectory(), wwwroot + "\\Upload\\ContractFile", fileName);
-
-					using (var stream = new FileStream(completePath, FileMode.Create)) {
+					using (FileStream stream = File.Create(completeFileName)) {
 						await file.CopyToAsync(stream);
 					}
 
@@ -466,7 +467,7 @@ namespace QLHSNS.Services {
 						Id = Guid.NewGuid(),
 						ContractId = id,
 						FileName = fileName,
-						FilePath = folder,
+						FilePath = filePath,
 						UploadDate = DateTime.Now
 					};
 
@@ -489,7 +490,7 @@ namespace QLHSNS.Services {
 
 		public async Task<ApiResponse<FileResponseDto>> DownloadFile(Guid id) {
 			try {
-				var filePaths = await _dbContext.Attachments.Where(x => x.ContractId == id).Select(x => x.FilePath).ToListAsync();
+				var filePaths = await _dbContext.Attachments.Where(x => x.ContractId == id).ToListAsync();
 
 				if (filePaths == null || filePaths.Count == 0) {
 					return new ApiResponse<FileResponseDto> {
@@ -503,19 +504,29 @@ namespace QLHSNS.Services {
 				var files = new List<string>();
 
 				foreach (var filePath in filePaths) {
-					var file = Directory.GetFiles(Path.Combine(_env.WebRootPath, filePath)).ToList();
-					files.AddRange(file);
+					var file = _env.WebRootPath + filePath.FilePath + "\\" + filePath.FileName;
+					files.Add(file);
 				}
 
+				// Create temporary memory to hold zip
 				using (var memoryStream = new MemoryStream()) {
-					using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true)) {
+					// create a new zip archive
+					using (var zipArchive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true)) {
 						foreach (var file in files) {
-							var theFile = archive.CreateEntry(file);
-							using (var streamWrite = new StreamWriter(theFile.Open())) {
-								streamWrite.Write(File.ReadAllText(file));
+							var fileInfo = new FileInfo(file);
+							
+							// Create a new entry in the zip archive for each file
+							var entry = zipArchive.CreateEntry(fileInfo.Name);
+
+							// Write the file contrent info the entry
+							using (var entryStream = entry.Open())
+							using (var fileStream = new FileStream(file, FileMode.Open, FileAccess.Read)) {
+								fileStream.CopyTo(entryStream);
 							}
 						}
 					}
+
+					memoryStream.Seek(0, SeekOrigin.Begin);
 
 					var result = new FileResponseDto {
 						FileType = "application/zip",
